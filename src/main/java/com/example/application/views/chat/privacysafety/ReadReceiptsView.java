@@ -30,7 +30,6 @@ public class ReadReceiptsView extends AppLayout {
    }
 
    private void createMainLayout() {
-   	String name = "";
 	boolean isReadReceipts = true;
    	if (isReadReceipts) {
    	    createReadReceiptsInformation();
