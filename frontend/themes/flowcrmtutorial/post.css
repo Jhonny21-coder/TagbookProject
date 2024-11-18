@@ -1,0 +1,230 @@
+.post-comment-main-layout {
+  padding: 0;
+  padding-left: 10px;
+}
+
+.post-comment-footer-layout > div > vaadin-icon:nth-child(1) {
+  background: var(--lumo-primary-color);
+}
+
+.post-comment-footer-layout > div > vaadin-icon:nth-child(2) {
+  background: var(--lumo-error-color);
+  right: 3px;
+}
+
+.post-comment-footer-layout > div > vaadin-icon:nth-child(3) {
+  background: var(--lumo-warning-color);
+  right: 6px;
+}
+
+.post-comment-footer-layout > div > vaadin-icon {
+  position: relative;
+  font-size: 12px;
+  border-radius: 50%;
+  padding: 3px;
+  color: white;
+}
+
+.post-comment-footer-layout > span:nth-child(3) {
+  margin-right: 10px;
+}
+
+.post-comment-footer-layout > span:nth-child(2) {
+  margin-right: 15px;
+}
+
+.post-comment-footer-layout > span:nth-child(2),
+.post-comment-footer-layout > span:nth-child(3) {
+  font-weight: bold;
+}
+
+.post-comment-footer-layout > span:nth-child(1) {
+  margin-left: 60px;
+  margin-right: 15px; 
+}
+
+.post-comment-footer-layout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  color: var(--lumo-contrast-70pct);
+  position: relative;
+  bottom: 12px;
+}
+
+.post-comment-layout > div > span:nth-child(2) {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.post-comment-layout > div > span:nth-child(1) {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.post-comment-layout > div {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  background: var(--lumo-contrast-5pct);
+  padding: 10px;
+  border-radius: 15px;
+  max-width: 270px;
+  white-space: pre;
+  justify-content: center;
+  margin: 0;
+}
+
+.post-comment-layout > vaadin-avatar {
+  pointer-events: none;
+  width: 40px;
+  height: 40px;
+  border: 0.5px solid var(--lumo-contrast-20pct);
+  margin-right: 8px;
+}
+
+.post-comment-layout {
+  margin-bottom: 10p;
+  display: flex;
+  flex-direction: row;
+}
+
+.post-comment-virtual-list {
+  height: auto;
+  padding-top: 5px;
+}
+
+.post-sorted-line {
+  height: 0.5px;
+  width: 100%;
+  background: var(--nav-border);
+}
+
+.post-sorted-okay-button {
+  background: var(--lumo-primary-color);
+  font-weight: bold;
+  color: white;
+  width: 100%;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.comment-app-layout > vaadin-form-layout {
+  overflow-x: hidden;
+  height: auto;
+}
+
+.post-sorted-header {
+  border-bottom: 0.5px solid var(--nav-border);
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+.post-sorted-div vaadin-radio-group[has-value] > vaadin-radio-button::part(radio) {
+  background: var(--lumo-primary-color);
+  border: 1px solid var(--lumo-primary-color);
+  color: green;
+}
+
+.post-sorted-div vaadin-radio-button::part(radio) {
+  border: 1px solid white;
+  background: none;
+  font-size: 20px;
+}
+
+.post-sorted-div > span:nth-child(2) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--lumo-contrast-70pct);
+}
+
+.post-sorted-div {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-sorted-layout {
+  padding-top: 10px;
+  padding-bottom: 15px;
+}
+
+.post-sorted-text {
+  padding-left: 8px;
+  margin-bottom: 10px;
+}
+
+.post-send-icon {
+  color: var(--lumo-primary-color);
+  font-size: 30px;
+  transform: rotate(40deg);
+  margin-top: 10p;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.post-upload > vaadin-button > vaadin-icon {
+  font-size: 25px;
+}
+
+.post-upload > vaadin-button {
+  background: none;
+  color: var(--lumo-contrast-60pct);
+  margin: 0;
+  font-size: 20px;
+  width: 28px;
+  padding: 0;
+  height: 50px;
+}
+
+.post-text-area > textarea:placeholder-shown {
+  position: relative;
+  top: 10px;
+}
+
+.post-text-area::part(input-field) {
+  background: var(--text-field);
+  border-radius: 40px;
+  width: 300px;
+  border: 1px solid var(--lumo-contrast-10pct);
+  position: relative;
+  right: 10px;
+  overflow: hidden;
+}
+
+.post-upload::part(done-icon),
+.post-upload[uploading],
+.post-upload::part(name),
+.post-upload::part(remove-button) {
+  display: none;
+}
+
+.post-footer-layout {
+  width: 100%;
+  border-top: 0.5px solid var(--nav-border);
+  padding: 5px;
+  align-items: center;
+}
+
+.post-header-layout > span {
+   font-weight: bold;
+}
+
+.post-header-layout {
+   width: 100%;
+   justify-content: space-between;
+   align-items: center;
+   padding-right: 5px;
+   padding-left: 10px;
+}
+
+.post-search-icon, .post-header-layout > vaadin-icon:nth-child(1) {
+   font-size: 20px;
+   color: white;
+}
+
+

@@ -1,0 +1,263 @@
+.purple-area::part(input-field){
+   background: #C500FF;
+}
+
+.black-area::part(input-field){
+   background: black;
+}
+
+.white-area::part(input-field){
+   background: #333436;
+}
+
+.red-area::part(input-field){
+   background: #E2013B;
+}
+
+.red-area > textarea:placeholder-shown,
+.black-area > textarea:placeholder-shown,
+.purple-area > textarea:placeholder-shown {
+  color: white;
+  font-weight: bold;
+}
+
+.white-area > textarea:placeholder-shown {
+   color: white;
+}
+
+.white-area {
+   margin-top: 3px;
+   height: 200px;
+}
+
+.red-area,
+.black-area,
+.purple-area {
+  margin-top: 3px;
+  height: 180px;
+}
+
+.white-area::part(input-field) {
+  border: 1px solid var(--lumo-contrast-5pct);
+  border-radius: 8px;
+  color: white;
+  height: 200px;
+}
+
+.red-area::part(input-field),
+.black-area::part(input-field),
+.purple-area::part(input-field) {
+  border: 1px solid var(--lumo-contrast-5pct);
+  border-radius: 0;
+  color: white;
+  height: 200px;
+  padding-top: 80p;
+  padding-left: 70p;
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(8) > div {
+  background: linear-gradient(to bottom, gray, black); /*gradient 4*/
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(7) > div {
+  background: linear-gradient(to bottom, yellow, orange, purple); /*gradient 3*/
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(6) > div {
+  background: linear-gradient(to top, 
+        #C500FF,
+  	var(--lumo-primary-color)
+  	); /*gradient 2*/
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(5) > div {
+  background: linear-gradient(to bottom, #E2013B, #C500FF, 
+  	var(--lumo-primary-color)); /*gradient 1*/
+}
+
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(4) > div {
+  background: black;
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(3) > div {
+  background: #E2013B; /*red*/
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(2) > div {
+  background: #C500FF; /*purple*/
+}
+
+.add-artwork-backgroun-tabs vaadin-tab:nth-child(1) > div{
+  background: white;
+}
+
+.add-artwork-backgroun-tabs[orientation="horizontal"] {
+  all: unset;
+}
+
+.add-artwork-backgroun-tabs::part(back-button),
+.add-artwork-backgroun-tabs::part(forward-button) {
+  display: none;
+}
+
+.add-artwork-backgroun-tabs vaadin-tab {
+  margin-top: 7px;
+  padding: 0;
+  padding: 4px;
+  width: 45px;
+}
+
+.add-artwork-backgroun-tabs::part(tabs){
+  all: unset;
+  display: flex;
+  overflow: auto;
+}
+
+.add-artwork-backgroun-tabs vaadin-tab > div {
+  position: relative;
+  height: 37px;
+  width: 37px;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.add-artwork-backgroun-tabs {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.add-artwork-layout > div > vaadin-button {
+  color: white;
+  background: #333436;
+  border: 0.5px solid var(--lumo-contrast-10pct);
+  font-size: 11px;
+  height: 30px;
+  width: 100px;
+}
+
+.add-artwork-layout > div {
+  display: flex;
+  flex-direction: column;
+}
+
+vaadin-app-layout.add-artwork-app-layout[overlay]{
+  background: var(--primary);
+  user-select: none;
+}
+
+vaadin-app-layout.add-artwork-app-layout::part(navbar){
+   align-items: center;
+   margin: 0;
+   background: var(--primary);
+   border-bottom: 0.5px solid var(--lumo-contrast-10pct);
+}
+
+.custom-field {
+  margin-top: 80px;
+}
+
+vaadin-text-field.custom-field::part(input-field) {
+  border: 0.5px solid white;
+  height: 3em;
+  transition: 0.6s;
+  border-radius: 20px;
+  background: linear-gradient(270deg, rgba(2, 29, 78, 0.681) 0%, rgba(31, 215, 232, 0.873) 60%);
+}
+
+vaadin-text-field.custom-field {
+  cursor: pointer;
+}
+
+vaadin-text-field.custom-field > input {
+  color: black;
+}
+
+vaadin-text-field.custom-field:active {
+  scale: 0.92;
+}
+
+vaadin-text-field.custom-field > [slot="suffix"] {
+  color: #0ef;
+  animation: bounce 3s none;
+}
+
+vaadin-text-field.custom-field::part(label) {
+  color: white;
+  
+}
+
+.form-layout {
+  margin-top: 60px;
+}
+
+
+vaadin-app-layout.register-form::part(navbar){
+ background: black;    
+}
+
+vaadin-app-layout.register-form::part(content) {
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.time-picker {
+  animation: fadeInRight 4s none;
+}
+
+vaadin-time-picker.time-picker::part(input-field) {
+  border: 0.5px solid white;
+  height: 3em;
+  border-radius: 20px;
+  background: linear-gradient(270deg, rgba(2, 29, 78, 0.681) 0%, rgba(31, 215, 232, 0.873) 60%);
+}
+
+vaadin-time-picker.time-picker > input {
+  background: linear-gradient(to right, black 80%, white 10%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+vaadin-time-picker.time-picker::part(label) {
+  color: white;
+  
+}
+
+vaadin-time-picker.time-picker::part(toggle-button) {
+  color: #0ef;
+  animation: bounce 1s none;
+}
+
+vaadin-text-area.text-area::part(input-field) {
+  border: 0.5px solid white;
+  height: 3em;
+  transition: 0.6s;
+  border-radius: 20px;
+  background: linear-gradient(270deg, rgba(2, 29, 78, 0.681) 0%, rgba(31, 215, 232, 0.873) 60%);
+}
+
+vaadin-text-area.text-area {
+  color: black;
+  cursor: pointer;
+  animation: fadeInLeft 3s none;
+}
+
+vaadin-text-field.register-field > input {
+  color: black;
+}
+
+vaadin-text-area.text-area:active {
+  scale: 0.92;
+}
+
+vaadin-text-area.text-area > [slot="suffix"] {
+  color: #0ef;
+  animation: bounce 3s none;
+}
+
+vaadin-text-area.text-area::part(label) {
+  color: white;
+  
+}
