@@ -217,94 +217,97 @@ public class MessageView extends AppLayout {
 		// Fetch the latest message for the conversation
 		ChatMessage latestMessage = chatService.getLatestMessageInConversation(conversation.getId());
 
-             	// Check if the latest message is from the current user
-            	boolean isFromMe = latestMessage.getSender().getId().equals(user.getId());
+		if (latestMessage != null) {
+             	    // Check if the latest message is from the current user
+            	    boolean isFromMe = latestMessage.getSender().getId().equals(user.getId());
 
-            	// For receiver status
-            	ChatMessage receiverStatus = chatService.findMessageByReceiver(latestMessage.getId(), otherUser.getId());
-            	// For sender status
-            	ChatMessage senderStatus = chatService.findMessageByReceiver(latestMessage.getId(), user.getId());
+            	    // For receiver status
+            	    ChatMessage receiverStatus = chatService.findMessageByReceiver(latestMessage.getId(), otherUser.getId());
+            	    // For sender status
+            	    ChatMessage senderStatus = chatService.findMessageByReceiver(latestMessage.getId(), user.getId());
 
-            	Div statusIndicatorIcon = createStatusIndicatorIcon(isFromMe, otherUser, receiverStatus);
+            	    Div statusIndicatorIcon = createStatusIndicatorIcon(isFromMe, otherUser, receiverStatus);
 
-            	Avatar avatar = new Avatar();
-            	avatar.setImage(otherUser.getProfileImage());
+            	    Avatar avatar = new Avatar();
+            	    avatar.setImage(otherUser.getProfileImage());
 
-		boolean isRead = conversationService.isReadByUser(conversation.getId(), user);
-		Span messageSpan = new Span();
-		String textColor = isRead ? "var(--secondary)" : "white";
-		String textShadow = isRead ? "none" : "0.5px 0.5px white";
-		messageSpan.getStyle().set("color", textColor)
+		    boolean isRead = conversationService.isReadByUser(conversation.getId(), user);
+		    Span messageSpan = new Span();
+		    String textColor = isRead ? "var(--secondary)" : "white";
+		    String textShadow = isRead ? "none" : "0.5px 0.5px white";
+		    messageSpan.getStyle().set("color", textColor)
 				      .set("text-shadow", textShadow);
 
-		// Create a span for the latest message
-		createMessageSpan(isFromMe, latestMessage, otherUser, senderStatus, messageSpan);
-            	subscribeTypingIndicator(isFromMe, otherUser, latestMessage, senderStatus);
+		    // Create a span for the latest message
+		    createMessageSpan(isFromMe, latestMessage, otherUser, senderStatus, messageSpan);
+            	    subscribeTypingIndicator(isFromMe, otherUser, latestMessage, senderStatus);
 
-	        List<ChatMessage> unseenMessages = chatService.getAllUnseenMessagesForUser(user.getId(), conversation.getId());
-            	Div unseenSpan = new Div();
-            	unseenSpan.addClassName("unseen-messages");
-		if (!isRead && unseenMessages.isEmpty()) {
-		    unseenSpan.setText(String.valueOf(1));
-		} else if (isRead && !unseenMessages.isEmpty()) {
-		    unseenSpan.setText(String.valueOf(unseenMessages.size()));
-		} else {
-		    unseenSpan.setVisible(false);
-		}
+	            List<ChatMessage> unseenMessages = chatService.getAllUnseenMessagesForUser(user.getId(), conversation.getId());
+            	    Div unseenSpan = new Div();
+            	    unseenSpan.addClassName("unseen-messages");
 
-		Span otherUserFullName = new Span(truncate(otherUser.getFullName(), 26));
-		String fullNameShadow = isRead ? "none" : "0.5px 0.5px currentColor";
-            	otherUserFullName.getStyle().set("text-shadow", fullNameShadow);
-
-		Icon mutedIcon = createMuteIcon(conversation.getId(), user);
-
-            	Div messageDiv = new Div(
-            	    new Div(avatar, new Div()),
-            	    new Div(otherUserFullName, new Div(unseenSpan, messageSpan)),
-            	    new Div(mutedIcon, statusIndicatorIcon)
-            	);
-            	messageDiv.addClassName("main-messages-div");
-
-            	messageSpans.put(latestMessage.getId(), messageSpan);
-            	messageDivs.put(latestMessage.getId(), messageDiv);
-            	messageStatusIndicators.put(latestMessage.getId(), statusIndicatorIcon);
-
-		MessageBottomSheet messageSheet = new MessageBottomSheet(
-		    sheet, muteSheet, customDurationSheet,
-		    userService, conversationService, chatService,
-		    muteService, blockService, messagesLayout
-		);
-
-		CustomEvent.handleLongPressEvent(messageDiv);
-        	messageDiv.getElement().addEventListener("long-press", e -> {
-        	    messageSheet.showBottomSheet(
-        		otherUser, user, messageDiv,
-        		conversation, mutedIcon, messageSpan,
-        		otherUserFullName, unseenSpan, unseenMessages
-        	    );
-        	});
-            	messageDiv.addClickListener(event -> {
-            	    // Handle message click
-	            if (!isFromMe) {
-                    	if (!unseenMessages.isEmpty()) {
-                    	    chatService.markUnseenMessagesAsSeen(unseenMessages);
-                    	    ChatMessage updatedMessage = chatService.getMessageById(senderStatus.getId());
-                    	    publisherStatus.onNext(updatedMessage);
-                    	}
+		    if (!isRead && unseenMessages.isEmpty()) {
+		    	unseenSpan.setText(String.valueOf(1));
+		    } else if (isRead && !unseenMessages.isEmpty()) {
+		    	unseenSpan.setText(String.valueOf(unseenMessages.size()));
+		    } else {
+		    	unseenSpan.setVisible(false);
 		    }
-		    if (!isRead) {
-			conversationService.setReadByUser(conversation.getId(), user, true);
-		    }
-	            UI.getCurrent().navigate(ChatView.class, otherUser.getId());
-            	});
 
-            	// Check if conversation is already subscribed
-            	String conversationKey = user.getId() + "-" + otherUser.getId();
-            	if (!subscribedConversations.contains(conversationKey)) {
-            	    subscribeLatestMessageUpdates(user, otherUser);
-            	    subscribedConversations.add(conversationKey);
+		    Span otherUserFullName = new Span(truncate(otherUser.getFullName(), 26));
+		    String fullNameShadow = isRead ? "none" : "0.5px 0.5px currentColor";
+            	    otherUserFullName.getStyle().set("text-shadow", fullNameShadow);
+
+		    Icon mutedIcon = createMuteIcon(conversation.getId(), user);
+
+            	    Div messageDiv = new Div(
+            	    	new Div(avatar, new Div()),
+            	    	new Div(otherUserFullName, new Div(unseenSpan, messageSpan)),
+            	    	new Div(mutedIcon, statusIndicatorIcon)
+            	    );
+            	    messageDiv.addClassName("main-messages-div");
+
+            	    messageSpans.put(latestMessage.getId(), messageSpan);
+            	    messageDivs.put(latestMessage.getId(), messageDiv);
+            	    messageStatusIndicators.put(latestMessage.getId(), statusIndicatorIcon);
+
+		    MessageBottomSheet messageSheet = new MessageBottomSheet(
+		    	sheet, muteSheet, customDurationSheet,
+		    	userService, conversationService, chatService,
+		    	muteService, blockService, messagesLayout
+		    );
+
+		    CustomEvent.handleLongPressEvent(messageDiv);
+        	    messageDiv.getElement().addEventListener("long-press", e -> {
+        	    	messageSheet.showBottomSheet(
+        		    otherUser, user, messageDiv,
+        		    conversation, mutedIcon, messageSpan,
+        		    otherUserFullName, unseenSpan, unseenMessages
+        	    	);
+        	    });
+            	    messageDiv.addClickListener(event -> {
+            	    	// Handle message click
+	            	if (!isFromMe) {
+                    	    if (!unseenMessages.isEmpty()) {
+                    	    	chatService.markUnseenMessagesAsSeen(unseenMessages);
+                    	    	ChatMessage updatedMessage = chatService.getMessageById(senderStatus.getId());
+                    	    	publisherStatus.onNext(updatedMessage);
+                    	    }
+		    	}
+		    	if (!isRead) {
+			    conversationService.setReadByUser(conversation.getId(), user, true);
+		    	}
+	            	UI.getCurrent().navigate(ChatView.class, otherUser.getId());
+            	    });
+
+            	    // Check if conversation is already subscribed
+            	    String conversationKey = user.getId() + "-" + otherUser.getId();
+            	    if (!subscribedConversations.contains(conversationKey)) {
+            	    	subscribeLatestMessageUpdates(user, otherUser);
+            	    	subscribedConversations.add(conversationKey);
+            	    }
+            	    messagesLayout.add(messageDiv);
             	}
-            	messagesLayout.add(messageDiv);
     	    }
     	}
     }
@@ -349,6 +352,7 @@ public class MessageView extends AppLayout {
              	new Div(),
              	new Span(firstName)
              );
+             followerDiv.addClickListener(event -> UI.getCurrent().navigate(ChatView.class, followerUser.getId()));
              avatarsLayout.add(followerDiv);
         });
         return avatarsLayout;

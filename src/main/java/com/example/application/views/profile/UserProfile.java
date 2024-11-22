@@ -66,6 +66,8 @@ public class UserProfile extends AppLayout implements HasUrlParameter<Long> {
     private final HeartReactionService heartService;
     private final CommentService commentService;
 
+    private int currentPage = 0;
+
     public UserProfile(ArtworkService artworkService, ContactService contactService,
     	FollowerService followerService, UserServices userService,
     	LikeReactionService likeService, HeartReactionService heartService,
@@ -482,7 +484,6 @@ public class UserProfile extends AppLayout implements HasUrlParameter<Long> {
 
     	HorizontalLayout buttonLayout = createStatistics(user, layout);
         buttonLayout.addClassName("profile-button-layout");
-        //buttonLayout.addClassName("profile-upload-layout");
 
         VerticalLayout informationLayout = createInformationLayout(user);
         informationLayout.addClassName("profile-information-layout");
@@ -496,7 +497,7 @@ public class UserProfile extends AppLayout implements HasUrlParameter<Long> {
 
 	ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
 
-	FormLayout profileImageFeed = feed.createFeed(user);
+	FormLayout profileImageFeed = feed.createFeed(user, currentPage);
 
         formLayout.add(image, layout2, buttonLayout, informationLayout, followLayout, profileImageFeed);
 

@@ -115,8 +115,14 @@ public class ArtworkService {
     	}
     }
 
+    // DTOs
     public List<ArtworkFeedDTO> getArtworkFeedDTOs(int offset, int limit) {
     	Pageable pageable = PageRequest.of(offset / limit, limit);
         return artworkRepository.findAllArtworkFeedDTOs(pageable).getContent();
+    }
+
+    public List<ArtworkFeedDTO> getUserArtworkDTOs(User user, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        return artworkRepository.findUserArtworkDTOs(user, pageable).getContent();
     }
 }

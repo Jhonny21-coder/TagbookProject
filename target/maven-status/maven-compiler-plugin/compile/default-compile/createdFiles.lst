@@ -21,6 +21,7 @@ com/example/application/services/ChatMessageService.class
 com/example/application/repository/StudentInfoRepository.class
 com/example/application/repository/notification/NotificationRepository.class
 com/example/application/views/follower/MainFollowerView.class
+com/example/application/views/PeopleWhoReactedView$LazyComponent.class
 com/example/application/views/AccessInfo.class
 com/example/application/views/ReactionsView.class
 com/example/application/data/Follower.class
@@ -38,6 +39,7 @@ com/example/application/views/PostReactionsView.class
 com/example/application/views/profile/ViewSpecificArtwork.class
 com/example/application/repository/ContactRepository.class
 com/example/application/repository/StatusRepository.class
+com/example/application/repository/ReactionCount.class
 com/example/application/repository/ReplyRepository.class
 com/example/application/views/chat/ChatUtils.class
 com/example/application/views/comment/CommentSectionView.class
@@ -87,6 +89,7 @@ com/example/application/views/notification/NotificationView.class
 com/example/application/services/FollowerService.class
 com/example/application/views/RegisterView.class
 com/example/application/views/artworks/AddArtwork$1.class
+com/example/application/views/PeopleWhoReactedView.class
 com/example/application/services/notification/NotificationService.class
 com/example/application/data/Comment.class
 com/example/application/views/LazyContainer.class

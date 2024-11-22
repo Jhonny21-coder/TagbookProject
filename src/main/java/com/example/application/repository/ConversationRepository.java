@@ -14,16 +14,6 @@ import java.util.Optional;
 import java.util.List;
 
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
-    /*@Query("SELECT new com.example.application.data.dto.conversation.ConversationUserDTO(" +
-       "c.id, " +
-       "CASE WHEN c.user1 = :user THEN c.user2.id ELSE c.user1.id END, " +
-       "CASE WHEN c.user1 = :user THEN CONCAT(c.user2.firstName, ' ', c.user2.lastName) ELSE CONCAT(c.user1.firstName, ' ', c.user1.lastName) END, " +
-       "CASE WHEN c.user1 = :user THEN c.user2.profileImage ELSE c.user1.profileImage END, " +
-       "c.messageRequest) " +
-       "FROM Conversation c " +
-       "WHERE c.user1 = :user OR c.user2 = :user")
-    List<ConversationUserDTO> findConversationUsersByUserDTO(@Param("user") User user);*/
-
     @Query("""
     SELECT new com.example.application.data.dto.conversation.ConversationUserDTO(
         c.id,

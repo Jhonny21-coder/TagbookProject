@@ -24,6 +24,16 @@
 @import "reacted.css";
 @import "notification.css";
 
+vaadin-form-layout::-webkit-scrollbar {
+   display: none;
+}
+
+vaadin-form-layout {
+   height: 100%;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
 vaadin-avatar {
    pointer-events: none;
 }

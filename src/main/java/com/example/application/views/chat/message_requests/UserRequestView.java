@@ -125,7 +125,7 @@ public class UserRequestView extends AppLayout implements HasUrlParameter<Long>{
    	Div viewProfileDiv = new Div(
    	   avatar,
    	   new Span(user.getFullName()),
-   	   new Button("View profile", e -> UI.getCurrent().navigate(UserProfile.class))
+   	   new Button("View profile", e -> UI.getCurrent().navigate(UserProfile.class, user.getId()))
    	);
    	viewProfileDiv.addClassName("user-request-view-profile");
 	return viewProfileDiv;

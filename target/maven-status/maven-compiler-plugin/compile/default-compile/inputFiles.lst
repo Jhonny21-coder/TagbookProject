@@ -17,6 +17,7 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/services/FollowerService.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/MessageView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/services/LikeReactionService.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/repository/ReactionCount.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/TypingEvent.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/MessagingNotificationsView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/PostReactionsView.java
@@ -34,6 +35,7 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/profile/FollowerView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/form/AboutYourselfView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/BlockView.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/PeopleWhoReactedView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/artworks/EditArtwork.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/repository/FollowerRepository.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/repository/PostReactionRepository.java

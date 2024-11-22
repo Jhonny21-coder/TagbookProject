@@ -8,7 +8,7 @@ import com.example.application.services.ConversationService;
 import com.example.application.data.Conversation;
 import com.example.application.data.Block;
 import com.example.application.services.BlockService;
-
+import com.example.application.views.profile.UserProfile;
 import com.example.application.views.BottomSheet;
 
 import com.vaadin.flow.component.Component;
@@ -105,9 +105,14 @@ public class ChatView extends AppLayout implements HasUrlParameter<Long> {
         User sender = userService.findCurrentUser();
         User receiver = userService.getUserById(receiverId);
 	Conversation conversation = conversationService.getOrCreateConversation(sender, receiver);
+
+	messageList.add(createViewProfileLayout(receiver));
+
         createHeader(receiver);
 	createFooter(sender, receiver);
+
         loadPreviousMessages(sender, receiver);
+
         subscribeRealTimeChat(sender, receiver);
         subscribeTypingIndicator(sender, receiver);
 
@@ -393,6 +398,20 @@ public class ChatView extends AppLayout implements HasUrlParameter<Long> {
     	    addToNavbar(true, inputLayout);
     	}
     }
+
+    private Div createViewProfileLayout(User user) {
+        String imageUrl = user.getProfileImage();
+        Avatar avatar = new Avatar();
+        avatar.setImage(imageUrl);
+
+        Div viewProfileDiv = new Div(
+           avatar,
+           new Span(user.getFullName()),
+           new Button("View profile", e -> UI.getCurrent().navigate(UserProfile.class, user.getId()))
+        );
+        viewProfileDiv.addClassName("user-request-view-profile");
+        return viewProfileDiv;
+   }
 
     private void createHeader(User receiver) {
     	Icon backIcon = new Icon("lumo", "arrow-left");

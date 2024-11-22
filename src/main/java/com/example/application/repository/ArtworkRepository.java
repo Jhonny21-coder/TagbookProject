@@ -28,8 +28,29 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
             )
     	FROM Artwork a
     	JOIN a.user u
+    	ORDER BY a.postTimestamp DESC
     """)
     Page<ArtworkFeedDTO> findAllArtworkFeedDTOs(Pageable pageable);
+
+    @Query("""
+        SELECT
+            new com.example.application.data.dto.post.ArtworkFeedDTO(
+                a.id,
+                a.description,
+                a.background,
+                a.postTimestamp,
+                u.id,
+                CONCAT(u.firstName, ' ', u.lastName),
+                u.profileImage,
+                a.artworkUrl,
+                (SELECT COUNT(c) FROM Comment c WHERE c.artwork.id = a.id)
+            )
+        FROM Artwork a
+        JOIN a.user u
+        WHERE a.user = :user
+        ORDER BY a.postTimestamp DESC
+    """)
+    Page<ArtworkFeedDTO> findUserArtworkDTOs(User user, Pageable pageable);
 
     int countByStudentInfoUser(User user);
 

@@ -86,6 +86,7 @@ import java.util.Locale;
 import java.util.List;
 import java.util.Date;
 import java.util.Collections;
+import java.util.stream.Collectors;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -134,7 +135,6 @@ public class MainFeed extends AppLayout {
 
         formLayout.add(createAddPostLayout(user), storyLayout);
 
-        //listenToScroll(formLayout);
         CustomEvent.handleScrollEvent(formLayout);
         formLayout.getElement().addEventListener("scroll-to-bottom", e -> {
     	    // Load more data here
@@ -145,7 +145,6 @@ public class MainFeed extends AppLayout {
         setContent(formLayout);
         loadPosts();
 
-        //createFeed();
         createFooter();
     }
 
@@ -528,12 +527,9 @@ public class MainFeed extends AppLayout {
 	smileContent.setVisible(false);
     }
 
-    //public void createFeed() {
     public void loadPosts() {
-    	//List<Artwork> artworks = artworkService.findPosts(currentPage * PAGE_SIZE, PAGE_SIZE);
     	List<ArtworkFeedDTO> artworks = artworkService.getArtworkFeedDTOs(currentPage * PAGE_SIZE, PAGE_SIZE);
     	System.out.println("DTO size: " + artworks.size());
-    	//Collections.reverse(artworks);
 
         /*// Create an IFrame component
         IFrame iframe = new IFrame("https://www.youtube.com/embed/dQw4w9WgXcQ");
@@ -635,7 +631,7 @@ public class MainFeed extends AppLayout {
         );
         reactionsView.showReactions(likeIcon, loveIcon, careIcon, hahaIcon, wowIcon, sadIcon, angryIcon);
 
-        HorizontalLayout reactionsLayout = new HorizontalLayout(
+        /*HorizontalLayout reactionsLayout = new HorizontalLayout(
         	new Div(
         	    likeIcon, loveIcon,
         	    careIcon, hahaIcon,
@@ -643,14 +639,54 @@ public class MainFeed extends AppLayout {
         	    angryIcon, totalReactions
         	),
         	commentsSpan
+	);*/
+	HorizontalLayout reactionsLayout = new HorizontalLayout(
+	    getMostReactions(artwork.getArtworkId(), totalReactions),
+	    commentsSpan
 	);
         reactionsLayout.addClassName("feed-only-reactions-layout");
+        reactionsLayout.addClickListener(event -> {
+             PeopleWhoReactedView reacted = new PeopleWhoReactedView(formLayout, artwork.getArtworkId(), postService);
+             reacted.open();
+        });
 
         closeIcon.addClickListener(event -> {
              formLayout.remove(headerLayout, content, reactionsLayout, buttonsLayout);
         });
 
     	formLayout.add(headerLayout, content, reactionsLayout, buttonsLayout);
+    }
+
+    private Div getMostReactions(Long artworkId, Span totalReactions) {
+    	/*Map<String, Long> reactionCounts = postService.getReactionCountsByArtworkId(artworkId);
+	List<String> sortedReactions = reactionCounts.entrySet().stream()
+            .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+            .map(Map.Entry::getKey)
+            .limit(3)
+            .collect(Collectors.toList());*/
+        List<PostReactionDTO> topReactions = postService.getTopReactionsByArtworkId(artworkId).getContent();
+
+	// Add top 3 reaction icons
+	Div reactionsDiv = new Div();
+        topReactions.forEach(reaction -> reactionsDiv.add(getIcon(reaction.getReactType())));
+        reactionsDiv.add(totalReactions);
+    	return reactionsDiv;
+    }
+
+    private SvgIcon getIcon(String reactType) {
+        Map<String, SvgIcon> reactionIcons = Map.of(
+            "like", new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))),
+            "love", new SvgIcon(new StreamResource("love.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/love.svg"))),
+            "care", new SvgIcon(new StreamResource("care.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/care.svg"))),
+            "haha", new SvgIcon(new StreamResource("haha.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/haha.svg"))),
+            "wow", new SvgIcon(new StreamResource("wow.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/wow.svg"))),
+            "sad", new SvgIcon(new StreamResource("sad.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/sad.svg"))),
+            "angry", new SvgIcon(new StreamResource("angry.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/angry.svg")))
+        );
+
+        SvgIcon icon = reactionIcons.getOrDefault(reactType, new SvgIcon(new StreamResource("like.svg",
+                () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))));
+        return icon;
     }
 
     private void createArtworkPost(ArtworkFeedDTO artwork){
@@ -711,9 +747,9 @@ public class MainFeed extends AppLayout {
         VerticalLayout profileLayout = createFeedHeader(artwork);
         profileLayout.addClassName("comment-user-header-layout");
 
-        List<PostReactionDTO> reactions = postService.getReactionsDTO(artwork.getArtworkId());
+        //List<PostReactionDTO> reactions = postService.getReactionsDTO(artwork.getArtworkId());
 
-        HorizontalLayout totalReactionsDiv = createTotalReactions(reactions, commented, artwork, totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
+        HorizontalLayout totalReactionsDiv = new HorizontalLayout();//createTotalReactions(reactions, commented, artwork, totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
         totalReactionsDiv.addClassName("comment-reactions-div");
         totalReactionsDiv.addClickListener(event -> {
             List<PostReaction> reactions2 = postService.getPostReactionsByArtworkId(artwork.getArtworkId());
@@ -728,7 +764,8 @@ public class MainFeed extends AppLayout {
         formLayout.add(profileLayout, image, totalReactionsDiv, buttonsLayout);
     }
 
-    public HorizontalLayout createTotalReactions(List<PostReactionDTO> reactions, Span commented, ArtworkFeedDTO artwork, Span totalReactions, Span likes, Span hearts, Span smiles, Icon likeIcon, Icon heartIcon, Icon happyIcon){
+    public HorizontalLayout createTotalReactions(List<PostReactionDTO> reactions, Span commented, ArtworkFeedDTO artwork,
+    	Span totalReactions, Span likes, Span hearts, Span smiles, Icon likeIcon, Icon heartIcon, Icon happyIcon){
     	int totalLikes = 0;
 	int totalHearts = 0;
 	int totalSmiles = 0;

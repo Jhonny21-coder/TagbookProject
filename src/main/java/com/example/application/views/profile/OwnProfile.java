@@ -17,6 +17,9 @@ import com.example.application.views.MainFeed;
 import com.example.application.views.story.StoryView;
 import com.example.application.views.form.UpdateUserInfo;
 import com.example.application.views.form.ViewProfilePicture;
+import com.example.application.views.CustomEvent;
+import com.example.application.views.PostReactionsView;
+import com.example.application.data.dto.post.ArtworkFeedDTO;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.router.Route;
@@ -83,9 +86,12 @@ public class OwnProfile extends AppLayout {
 
     private final Upload profilePhotoUpload = new Upload();
     private final Upload coverPhotoUpload = new Upload();
+    private FormLayout formLayout = new FormLayout();
 
     private String newFilename;
     private String coverPhotoFileName;
+    private int currentPage = 0;
+    private final int PAGE_SIZE = 10;
 
     public OwnProfile(ArtworkService artworkService, ContactService contactService,
     	FollowerService followerService, UserServices userService,
@@ -503,8 +509,35 @@ public class OwnProfile extends AppLayout {
     	}
     }
 
+    public void loadPosts(User user) {
+        System.out.println("Listener triggered. Current Page: " + currentPage);
+
+        ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
+
+        List<ArtworkFeedDTO> artworks = artworkService.getUserArtworkDTOs(user, currentPage * PAGE_SIZE, PAGE_SIZE);
+        for (ArtworkFeedDTO artwork : artworks) {
+             String background = artwork.getArtworkBackground();
+
+             if (background == null) {
+                 feed.createArtworkPost(artwork, formLayout);
+             } else {
+                 feed.createPostOnly(artwork, formLayout);
+             }
+        }
+        currentPage++;
+        System.out.println("Artworks size: " + artworks.size());
+    }
+
     private void createFollowerLayout(User user) {
-    	FormLayout formLayout = new FormLayout();
+    	//ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
+
+    	//FormLayout formLayout = new FormLayout();
+    	CustomEvent.handleScrollEvent(formLayout);
+        formLayout.getElement().addEventListener("scroll-to-bottom", e -> {
+            // Load more data
+            System.out.println("Page " + currentPage + " loaded.");
+            loadPosts(user);
+        });
 
     	List<Follower> followers = followerService.getFollowersByFollowedUserId(user.getId());
     	int maxFollowersToShow = 3;
@@ -624,11 +657,10 @@ public class OwnProfile extends AppLayout {
         VerticalLayout followLayout = new VerticalLayout(followerHeader, layout, imageButton);
 	followLayout.addClassName("second-follow-layout");
 
-	ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
+	//FormLayout profileImageFeed = feed.createFeed(user, currentPage);
 
-	FormLayout profileImageFeed = feed.createFeed(user);
-
-        formLayout.add(image, layout2, buttonLayout, informationLayout, followLayout, profileImageFeed);
+        formLayout.add(image, layout2, buttonLayout, informationLayout, followLayout/*, profileImageFeed*/);
+        loadPosts(user);
 
     	setContent(formLayout);
     }

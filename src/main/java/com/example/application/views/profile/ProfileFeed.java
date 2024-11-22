@@ -1,5 +1,7 @@
 package com.example.application.views.profile;
 
+import com.example.application.data.dto.post.PostReactionDTO;
+import com.example.application.data.dto.post.ArtworkFeedDTO;
 import com.example.application.services.notification.NotificationService;
 import com.example.application.data.PostReaction;
 import com.example.application.services.PostReactionService;
@@ -17,6 +19,8 @@ import com.example.application.views.profile.UserProfile;
 import com.example.application.views.comment.CommentSectionView;
 import com.example.application.views.comment.CommentView;
 import com.example.application.views.MainFeed;
+import com.example.application.views.CustomEvent;
+import com.example.application.views.PostReactionsView;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -28,6 +32,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -57,6 +62,7 @@ import java.util.HashMap;
 import java.text.DecimalFormat;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProfileFeed extends AppLayout {
@@ -68,6 +74,11 @@ public class ProfileFeed extends AppLayout {
     private final UserServices userService;
     private final PostReactionService postService;
     private final NotificationService notificationService;
+
+    /*private FormLayout formLayout = new FormLayout();
+    private int currentPage = 0;
+    private final int PAGE_SIZE = 10;
+    private FormLayout formLayout = new FormLayout();*/
 
     public ProfileFeed(ArtworkService artworkService, LikeReactionService likeService,
     	HeartReactionService heartService, CommentService commentService, UserServices userService,
@@ -170,7 +181,7 @@ public class ProfileFeed extends AppLayout {
         return allContent;
     }
 
-    public void createReactedLayout(List<PostReaction> reactions, ConfirmDialog dialog) {
+    private void createReactedLayout(List<PostReaction> reactions, ConfirmDialog dialog) {
         dialog.open();
 
         int totalLikes = 0;
@@ -305,31 +316,31 @@ public class ProfileFeed extends AppLayout {
         smileContent.setVisible(false);
     }
 
-    public FormLayout createFeed(User userr){
-    	List<Artwork> artworks = artworkService.getArtworksByUserId(userr.getId());
+    public void loadPosts(User user, int currentPage) {
+        System.out.println("Listener triggered. Current Page: " + currentPage);
 
-	FormLayout formLayout = new FormLayout();
+    	final int PAGE_SIZE = 10;
 
-    	for(Artwork artwork : artworks){
-    	    String background = artwork.getBackground();
+        List<ArtworkFeedDTO> artworks = artworkService.getUserArtworkDTOs(user, currentPage * PAGE_SIZE, PAGE_SIZE);
+        for (ArtworkFeedDTO artwork : artworks) {
+             String background = artwork.getArtworkBackground();
 
              if (background == null) {
-             	 createArtworkPost(artwork, formLayout);
+                 //createArtworkPost(artwork);
              } else {
-                 createPostOnly(artwork, formLayout);
+                 //createPostOnly(artwork);
              }
-    	}
-
-    	return formLayout;
+        }
+        System.out.println("Artworks size: " + artworks.size());
     }
 
-    private void createPostOnly(Artwork artwork, FormLayout formLayout){
-        User user = artwork.getUser();
+    public FormLayout createFeed(User user, int currentPage){
+    	loadPosts(user, currentPage);
+    	return new FormLayout();
+    }
 
-        String imageUrl = user.getProfileImage();
-
-        Avatar avatar = new Avatar();
-        avatar.setImage(imageUrl);
+    public void createPostOnly(ArtworkFeedDTO artwork, FormLayout formLayout){
+        Avatar avatar = new Avatar("", artwork.getUserProfileImage());
         avatar.addClassName("feed-only-avatar");
 
         Span timeAgo = new Span();
@@ -338,7 +349,7 @@ public class ProfileFeed extends AppLayout {
         timeAgo.add(" • ");
         timeAgo.add(new Icon("vaadin", "globe"));
 
-        Div nameDiv = new Div(new Span(user.getFullName()), timeAgo);
+        Div nameDiv = new Div(new Span(artwork.getUserFullName()), timeAgo);
         nameDiv.addClassName("feed-only-name-div");
 
         Icon moreIcon = new Icon("vaadin", "ellipsis-dots-h");
@@ -350,32 +361,32 @@ public class ProfileFeed extends AppLayout {
         HorizontalLayout headerLayout = new HorizontalLayout(avatar, nameDiv, new Div(moreIcon, closeIcon));
         headerLayout.addClassName("feed-only-header-layout");
 
-        Div content = new Div(new Span(artwork.getDescription()));
+        Div content = new Div(new Span(artwork.getArtworkDescription()));
         content.addClassName("feed-only-content");
 
-        String background = artwork.getBackground();
+        String background = artwork.getArtworkBackground();
 
         if (background != null){
             content.getStyle().set("background", background);
         }
 
-        List<Comment> comments = commentService.getCommentsByArtworkId(artwork.getId());
+        Long commentsCount = artwork.getCommentsCount();
 
-        String withDecimal = formatValue(comments.size(), true);
-        String withoutDecimal = formatValue(comments.size(), false);
+        String withDecimal = formatValue(commentsCount, true);
+        String withoutDecimal = formatValue(commentsCount + 999998, false);
 
         Button commentButton = new Button(new Icon("vaadin", "comment-o"));
         commentButton.addClickListener(event -> {
-            Long artworkId = artwork.getId();
+            Long artworkId = artwork.getArtworkId();
             VaadinSession.getCurrent().getSession().setAttribute("main", artworkId);
             UI.getCurrent().navigate(CommentView.class, artworkId);
         });
 
         Span commentsSpan = new Span();
 
-        if (comments.size() > 0) {
+        if (commentsCount > 0) {
             commentButton.setText(withoutDecimal);
-            String text = comments.size() == 0 ? " Comment" : " Comments";
+            String text = commentsCount == 0 ? " Comment" : " Comments";
             commentsSpan.setText(withDecimal + text);
         }
 
@@ -387,17 +398,35 @@ public class ProfileFeed extends AppLayout {
         HorizontalLayout buttonsLayout = new HorizontalLayout(likeButton, commentButton, chatButton, shareButton);
         buttonsLayout.addClassName("feed-only-buttons-layout");
 
-        Icon likeIcon = new Icon("vaadin", "thumbs-up");
-        Icon heartIcon = new Icon("vaadin", "heart");
-        Icon happyIcon = new Icon("vaadin", "smiley-o");
+        SvgIcon likeIcon = new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg")));
+        SvgIcon loveIcon = new SvgIcon(new StreamResource("love.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/love.svg")));
+        SvgIcon careIcon = new SvgIcon(new StreamResource("care.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/care.svg")));
+        SvgIcon hahaIcon = new SvgIcon(new StreamResource("haha.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/haha.svg")));
+        SvgIcon wowIcon = new SvgIcon(new StreamResource("wow.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/wow.svg")));
+        SvgIcon sadIcon = new SvgIcon(new StreamResource("sad.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/sad.svg")));
+        SvgIcon angryIcon = new SvgIcon(new StreamResource("angry.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/angry.svg")));
 
         Span totalReactions = new Span();
         totalReactions.addClassName("feed-only-totalReactions");
 
-        showReactions(likeButton, artwork, totalReactions, new Span(), new Span(), new Span(), likeIcon, heartIcon, happyIcon);
+        PostReactionsView reactionsView = new PostReactionsView(
+                notificationService,
+                artworkService,
+                postService,
+                userService,
+                likeButton,
+                totalReactions,
+                artwork
+        );
+        reactionsView.showReactions(likeIcon, loveIcon, careIcon, hahaIcon, wowIcon, sadIcon, angryIcon);
 
         HorizontalLayout reactionsLayout = new HorizontalLayout(
-                new Div(likeIcon, heartIcon, happyIcon, totalReactions),
+                new Div(
+                    likeIcon, loveIcon,
+                    careIcon, hahaIcon,
+                    wowIcon, sadIcon,
+                    angryIcon, totalReactions
+                ),
                 commentsSpan
         );
         reactionsLayout.addClassName("feed-only-reactions-layout");
@@ -409,13 +438,12 @@ public class ProfileFeed extends AppLayout {
         formLayout.add(headerLayout, content, reactionsLayout, buttonsLayout);
     }
 
-    private void createArtworkPost(Artwork artwork, FormLayout formLayout){
+    public void createArtworkPost(ArtworkFeedDTO artwork, FormLayout formLayout){
         String imageUrl = artwork.getArtworkUrl();
 
         Image image = new Image(imageUrl, "artwork-image");
         image.addClassName("main-feed-image");
 
-        User user = artwork.getUser();
         User currentUser = userService.findCurrentUser();
 
         Span commented = new Span();
@@ -447,24 +475,33 @@ public class ProfileFeed extends AppLayout {
         Icon happyIcon = new Icon(VaadinIcon.SMILEY_O);
         happyIcon.addClassName("reactions-happy");
 
-        showReactions(likeButton, artwork, totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
+        PostReactionsView reactionsView = new PostReactionsView(
+                notificationService,
+                artworkService,
+                postService,
+                userService,
+                likeButton,
+                totalReactions,
+                artwork
+        );
+        //reactionsView.showReactions(likeIcon, heartIcon, happyIcon, likes, hearts, smiles);
 
-        Button commentButton = createCommentButtonListener(user, artwork);
+        Button commentButton = createCommentButtonListener(artwork);
         Button shareButton = new Button("7262", new Icon(VaadinIcon.ARROW_FORWARD));
         shareButton.addClassName("feed-heart");
 
         HorizontalLayout buttonsLayout = new HorizontalLayout(likeButton, commentButton, shareButton);
         buttonsLayout.addClassName("main-feed-buttons");
 
-        VerticalLayout profileLayout = createFeedHeader(user, artwork);
+        VerticalLayout profileLayout = createFeedHeader(artwork);
         profileLayout.addClassName("comment-user-header-layout");
 
-        List<PostReaction> reactions = postService.getPostReactionsByArtworkId(artwork.getId());
+        List<PostReactionDTO> reactions = postService.getReactionsDTO(artwork.getArtworkId());
 
         HorizontalLayout totalReactionsDiv = createTotalReactions(reactions, commented, artwork, totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
         totalReactionsDiv.addClassName("comment-reactions-div");
         totalReactionsDiv.addClickListener(event -> {
-            List<PostReaction> reactions2 = postService.getPostReactionsByArtworkId(artwork.getId());
+            List<PostReaction> reactions2 = postService.getPostReactionsByArtworkId(artwork.getArtworkId());
 
             ConfirmDialog dialog = new ConfirmDialog();
             dialog.addClassName("main-reactor-dialog");
@@ -476,213 +513,13 @@ public class ProfileFeed extends AppLayout {
         formLayout.add(profileLayout, image, totalReactionsDiv, buttonsLayout);
     }
 
-    public void showReactions(Button likeButton, Artwork artwork, Span totalReactions, Span likes, Span hearts,
-        Span smiles, Icon likeIcon, Icon heartIcon, Icon happyIcon){
-
-        List<PostReaction> reactions = postService.getPostReactionsByArtworkId(artwork.getId());
-
-        // Map to store reaction counts
-        Map<String, Integer> reactionCounts = new HashMap<>();
-        reactionCounts.put("Like", 0);
-        reactionCounts.put("Heart", 0);
-        reactionCounts.put("Happy", 0);
-
-        // Count the reactions
-        for (PostReaction reaction : reactions) {
-             reactionCounts.computeIfPresent(reaction.getReactType(), (k, v) -> v + 1);
-        }
-
-        // Update the UI components based on counts
-        updateReactionComponent(likeIcon, likes, reactionCounts.get("Like"));
-        updateReactionComponent(heartIcon, hearts, reactionCounts.get("Heart"));
-        updateReactionComponent(happyIcon, smiles, reactionCounts.get("Happy"));
-
-        Dialog dialog = new Dialog();
-        dialog.addClassName("comment-dialog");
-
-        AtomicLong totalReacts = new AtomicLong(reactions.size());
-
-        if(totalReacts.get() != 0){
-           totalReactions.setText(formatValue(totalReacts.get(), true) + " reactions");
-           likeButton.setText(formatValue(totalReacts.get(), false));
-        }else if(totalReacts.get() == 0){
-           likeButton.setIcon(new Icon(VaadinIcon.THUMBS_UP_O));
-           likeButton.setText("");
-           likeButton.getStyle().set("color", "white");
-        }
-
-        User currentUser = userService.findCurrentUser();
-
-        PostReaction reactor = postService.getPostReactionByReactorAndArtworkId(currentUser.getId(), artwork.getId());
-
-        AtomicBoolean isReacted = new AtomicBoolean(reactor != null);
-
-        Icon alreadyLiked = new Icon(VaadinIcon.THUMBS_UP);
-        alreadyLiked.addClassName("feed-listener-like");
-
-        Icon alreadyHearted = new Icon(VaadinIcon.HEART);
-        alreadyHearted.addClassName("feed-listener-heart");
-
-        Icon alreadySmiled = new Icon(VaadinIcon.SMILEY_O);
-        alreadySmiled.addClassName("feed-listener-happy");
-
-        if(isReacted.get() && reactor.getReactType().equalsIgnoreCase("Like")){
-            likeButton.setIcon(alreadyLiked);
-        }else if(isReacted.get() && reactor.getReactType().equalsIgnoreCase("Heart")){
-            likeButton.setIcon(alreadyHearted);
-        }else if(isReacted.get() && reactor.getReactType().equalsIgnoreCase("Happy")){
-            likeButton.setIcon(alreadySmiled);
-        }
-
-        Icon likeReactIcon = new Icon(VaadinIcon.THUMBS_UP);
-        likeReactIcon.addClassName("like-react-icon");
-        likeReactIcon.addClickListener(e -> {
-            createButtonsListener(isReacted, "Like", totalReacts, likeButton, artwork, "primary", totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
-            dialog.close();
-        });
-
-        Icon heartReactIcon = new Icon(VaadinIcon.HEART);
-        heartReactIcon.addClassName("heart-react-icon");
-        heartReactIcon.addClickListener(e -> {
-            createButtonsListener(isReacted, "Heart", totalReacts, likeButton, artwork, "error", totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
-            dialog.close();
-        });
-
-        Icon happyReactIcon = new Icon(VaadinIcon.SMILEY_O);
-        happyReactIcon.addClassName("happy-react-icon");
-        happyReactIcon.addClickListener(e -> {
-            createButtonsListener(isReacted, "Happy", totalReacts, likeButton, artwork, "warning", totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
-            dialog.close();
-        });
-
-        dialog.add(
-            new VerticalLayout(likeReactIcon, new Span("Like")),
-            new VerticalLayout(heartReactIcon, new Span("Heart")),
-            new VerticalLayout(happyReactIcon, new Span("Happy"))
-        );
-
-        likeButton.addClickListener(event -> {
-             dialog.open();
-        });
-    }
-
-    public void createButtonsListener(AtomicBoolean isReacted, String reactType, AtomicLong totalReacts, Button button,
-        Artwork artwork, String colorTheme, Span totalReactions, Span likes, Span hearts, Span smiles,
-        Icon likeIcon, Icon heartIcon, Icon happyIcon){
-
-        User currentUser = userService.findCurrentUser();
-
-        Icon likeIcon2 = new Icon(VaadinIcon.THUMBS_UP);
-        likeIcon2.addClassName("feed-listener-like");
-
-        Icon heartIcon2 = new Icon(VaadinIcon.HEART);
-        heartIcon2.addClassName("feed-listener-heart");
-
-        Icon happyIcon2 = new Icon(VaadinIcon.SMILEY_O);
-        happyIcon2.addClassName("feed-listener-happy");
-
-        if (!isReacted.get()) {
-            // Reacting to the post
-            postService.savePostReaction(artwork, currentUser, reactType);
-            notificationService.createReactNotification(currentUser, artwork);
-            updateReactionCount(totalReacts.incrementAndGet(), button, totalReactions);
-            setReactionIcon(button, colorTheme);
-            isReacted.set(true);
-        } else {
-            // Already reacted, handle unreacting or updating reaction type
-            Long reactorId = currentUser.getId();
-            Long artworkId = artwork.getId();
-            PostReaction reactor = postService.getPostReactionByReactorAndArtworkId(reactorId, artworkId);
-
-            if (reactor.getReactType().equalsIgnoreCase(reactType)) {
-                // Unreact if the reaction type is the same
-                postService.removePostReaction(reactorId, artworkId);
-                updateReactionCount(totalReacts.decrementAndGet(), button, totalReactions);
-                button.setIcon(new Icon(VaadinIcon.THUMBS_UP_O));
-                button.getStyle().set("color", "white");
-                isReacted.set(false);
-            } else {
-                // Update the reaction type
-                postService.updatePostReaction(reactor, reactType);
-                setReactionIcon(button, colorTheme);
-                isReacted.set(true);
-            }
-        }
-
-        List<PostReaction> reactions = postService.getPostReactionsByArtworkId(artwork.getId());
-
-        if (reactions.isEmpty()) {
-            totalReactions.setText("");
-        } else {
-            totalReactions.setText(formatValue(reactions.size(), true));
-        }
-
-        // Map to store reaction counts
-        Map<String, Integer> reactionCounts = new HashMap<>();
-        reactionCounts.put("Like", 0);
-        reactionCounts.put("Heart", 0);
-        reactionCounts.put("Happy", 0);
-
-        // Count the reactions
-        for (PostReaction reaction : reactions) {
-             reactionCounts.computeIfPresent(reaction.getReactType(), (k, v) -> v + 1);
-        }
-
-        // Update the UI components based on counts
-        updateReactionComponent(likeIcon, likes, reactionCounts.get("Like"));
-        updateReactionComponent(heartIcon, hearts, reactionCounts.get("Heart"));
-        updateReactionComponent(happyIcon, smiles, reactionCounts.get("Happy"));
-    }
-
-    private void updateReactionCount(long count, Button button, Span totalReactions) {
-        String formattedValue = count > 0 ? formatValue(count, false) : "";
-        button.setText(formattedValue);
-        totalReactions.setText(formattedValue);
-    }
-
-    private void setReactionIcon(Button button, String colorTheme) {
-        Icon likeIcon = new Icon(VaadinIcon.THUMBS_UP);
-        likeIcon.addClassName("feed-listener-like");
-
-        Icon heartIcon = new Icon(VaadinIcon.HEART);
-        heartIcon.addClassName("feed-listener-heart");
-
-        Icon happyIcon = new Icon(VaadinIcon.SMILEY_O);
-        happyIcon.addClassName("feed-listener-happy");
-
-        switch (colorTheme) {
-            case "primary":
-                button.setIcon(likeIcon);
-                break;
-            case "error":
-                button.setIcon(heartIcon);
-                break;
-            case "warning":
-                button.setIcon(happyIcon);
-                break;
-            default:
-                button.setIcon(new Icon("vaadin", "thumbs-up-o"));
-                button.getStyle().set("color", "white");
-                break;
-        }
-    }
-
-    // Method to update visibility and text
-    private void updateReactionComponent(Icon icon, Span label, int count) {
-        boolean isVisible = count > 0;
-        icon.setVisible(isVisible);
-        label.setVisible(isVisible);
-        if (isVisible) {
-            label.setText(formatValue(count, false));
-        }
-    }
-
-    public HorizontalLayout createTotalReactions(List<PostReaction> reactions, Span commented, Artwork artwork, Span totalReactions, Span likes, Span hearts, Span smiles, Icon likeIcon, Icon heartIcon, Icon happyIcon){
+    private HorizontalLayout createTotalReactions(List<PostReactionDTO> reactions, Span commented, ArtworkFeedDTO artwork,
+        Span totalReactions, Span likes, Span hearts, Span smiles, Icon likeIcon, Icon heartIcon, Icon happyIcon){
         int totalLikes = 0;
         int totalHearts = 0;
         int totalSmiles = 0;
 
-        for(PostReaction reaction : reactions){
+        for(PostReactionDTO reaction : reactions){
             if(reaction.getReactType().equals("Like")){
                totalLikes++;
             }else if(reaction.getReactType().equals("Heart")){
@@ -713,74 +550,55 @@ public class ProfileFeed extends AppLayout {
 
         Long totals = (long) reactions.size();
 
-        totalReactions.setText(formatValue(totals, true) + " reactions");
+        totalReactions.setText(formatValue(totals, true));
 
-        List<Comment> comments = commentService.getCommentsByArtworkId(artwork.getId());
-        commented.setText(formatValue((long) comments.size(), true) + " comments");
+        Long totalComments = artwork.getCommentsCount();
+        commented.setText(formatValue(totalComments, true) + " comments");
 
-        HorizontalLayout reactionsDiv = new HorizontalLayout(likeIcon,likes, heartIcon,hearts,  happyIcon, smiles); //commented, totalReactions
+        HorizontalLayout reactionsDiv = new HorizontalLayout(likeIcon,likes, heartIcon,hearts,  happyIcon, smiles);
         reactionsDiv.addClassName("comment-reactions-div");
 
         return reactionsDiv;
     }
 
-    private VerticalLayout createFeedHeader(User user, Artwork artwork){
-        String imageUrl = user.getProfileImage();
-        Avatar avatar = new Avatar();
-        avatar.setImage(imageUrl);
+    private VerticalLayout createFeedHeader(ArtworkFeedDTO artwork){
+        Avatar avatar = new Avatar("", artwork.getUserProfileImage());
         avatar.addClassName("profile-user-avatar");
 
         Div avatarDiv = new Div(avatar);
 
-        Span name = new Span(user.getFullName());
+        Span name = new Span(artwork.getUserFullName());
         name.addClassName("profile-user-fullname");
 
-        String description = artwork.getDescription();
-
-        if (description.length() > 37) {
-           description = description.replaceAll("(.{37})", "$1\n");
-        }
-
-        Span title = new Span(description);
+        Span title = new Span(artwork.getArtworkDescription());
         title.addClassName("comment-title");
 
-        Span dateTime = new Span(artwork.getDateTime());
+        Span dateTime = new Span("2024-09-07 09:09:01");
         dateTime.addClassName("comment-date-time");
 
         HorizontalLayout layout = new HorizontalLayout(avatarDiv, name);
         layout.addClassName("comment-user-layout");
-        /*layout.addClickListener(event -> {
-            UI.getCurrent().navigate(UserProfile.class, user.getId());
-        });*/
+        layout.addClickListener(event -> {
+            UI.getCurrent().navigate(UserProfile.class, artwork.getUserId());
+        });
 
         return new VerticalLayout(layout, dateTime, title);
     }
 
-    public Button createCommentButtonListener(User user, Artwork artwork){
-    	List<Comment> comments = commentService.getCommentsByArtworkId(artwork.getId());
+    private Button createCommentButtonListener(ArtworkFeedDTO artwork){
+        Long totalComments = artwork.getCommentsCount();
 
-	Long totalComments = (long) comments.size();
-
-    	Button commentButton = new Button();
-	commentButton.addClassName("feed-comment");
-	commentButton.setIcon(new Icon(VaadinIcon.COMMENT_ELLIPSIS_O));
-	commentButton.setText(formatValue(totalComments, false));
-	commentButton.addClickListener(event -> {
-	    Set<String> sessionNames = VaadinSession.getCurrent().getSession().getAttributeNames();
-
-	    for(String sessionName : sessionNames){
-	    	if(sessionName.equals("main")){
-	    	   VaadinSession.getCurrent().getSession().removeAttribute("main");
-	    	}
-	    }
-
-	    Long artworkId = artwork.getId();
-            VaadinSession.getCurrent().getSession().setAttribute("profile", artworkId);
-
+        Button commentButton = new Button();
+        commentButton.addClassName("feed-comment");
+        commentButton.setIcon(new Icon(VaadinIcon.COMMENT_ELLIPSIS_O));
+        commentButton.setText(formatValue(totalComments, false));
+        commentButton.addClickListener(event -> {
+            Long artworkId = artwork.getArtworkId();
+            VaadinSession.getCurrent().getSession().setAttribute("main", artworkId);
             UI.getCurrent().navigate(CommentSectionView.class, artworkId);
-	});
+        });
 
-	return commentButton;
+        return commentButton;
     }
 
     private String formatValue(long value, boolean includeDecimal) {
@@ -817,7 +635,7 @@ public class ProfileFeed extends AppLayout {
         }
     }
 
-    private void updateTimeAgo(Artwork artwork, Span timeAgo) {
+    private void updateTimeAgo(ArtworkFeedDTO artwork, Span timeAgo) {
         LocalDateTime creationTime = artwork.getPostTimestamp();
         LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Manila"));
 

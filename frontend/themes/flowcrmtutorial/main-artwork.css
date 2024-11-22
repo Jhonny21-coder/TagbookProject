@@ -3,6 +3,7 @@
 @import "story.css";
 @import "search.css";
 @import "messages.css";
+@import "people-reacted.css";
 
 .feed-reaction > vaadin-icon {
    background: green !important;
