@@ -2,6 +2,7 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/profile/ViewAllFollowers.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/BlockOnTagbookView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/config/CustomUserDetailsService.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/dto/user/UserDTO.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/Application.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/ActiveStatusView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/story/StoryView.java

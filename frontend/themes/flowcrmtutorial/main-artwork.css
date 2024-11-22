@@ -238,13 +238,20 @@
 }
 
 .feed-footer-logo {
-   color: white;
-   font-weight: bold;
-   font-family: monospace;
-   font-size: 30px;
-   margin-left: 10px;
-   position: relative;
-   top: 5px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 30px;
+  color: #1877F2;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  position: relativ;
+  top: 5px;
+}
+
+.feed-footer-logo span:first-child {
+  font-size: 48px;
+  font-family: cursive;
 }
 
 .feed-footer-layout {
@@ -252,8 +259,6 @@
    width: 100%;
    height: 56px;
    display: fle;
-/*   align-items: cente;*/
-/*   justify-content: cente;*/
    color: white;
    border-top: 0.5px solid black;
 }

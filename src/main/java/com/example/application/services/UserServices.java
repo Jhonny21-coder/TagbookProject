@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.data.dto.user.UserDTO;
 import com.example.application.data.User;
 import com.example.application.repository.UserRepository;
 import com.example.application.data.StudentInfo;
@@ -162,5 +163,10 @@ public class UserServices {
 
     public User findByFullName(String fullName){
     	return userRepository.findByFullName(fullName);
+    }
+
+    // Get Users' full name only
+    public List<UserDTO> getUsersFullNameDTO() {
+    	return userRepository.findUsersFullNameDTO();
     }
 }

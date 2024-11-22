@@ -1,6 +1,7 @@
 com/example/application/repository/SearchRepository.class
 com/example/application/views/password/RandomGeneratorView$1.class
 com/example/application/data/story/StoryReaction.class
+com/example/application/data/dto/user/UserDTO.class
 com/example/application/repository/story/StoryReactionRepository.class
 com/example/application/views/form/UpdateUserInfo.class
 com/example/application/data/SavedPost.class
