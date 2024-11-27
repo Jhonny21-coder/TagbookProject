@@ -42,7 +42,7 @@ public class CustomEvent {
                 let scrollPosition = $0.scrollTop;
                 let scrollHeight = $0.scrollHeight;
                 let clientHeight = $0.offsetHeight;
-                let threshold = 0.8;
+                let threshold = 0.7;
 
                 if (isScrollThresholdReached(scrollPosition, scrollHeight, clientHeight, threshold) && !loaded) {
                     loaded = true;

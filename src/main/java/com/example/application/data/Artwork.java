@@ -1,13 +1,17 @@
 package com.example.application.data;
 
+import com.example.application.data.post.PostType;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 public class Artwork {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,71 +25,18 @@ public class Artwork {
     private User user;
     private String artworkUrl;
     private String description;
+
+    @Column(nullable = false)
     private LocalDateTime postTimestamp;
+
     private String dateTime;
     private String background;
 
-    public Long getId() {
-    	return id;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PostType postType;
 
-    public void setId(Long id) {
-    	this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public StudentInfo getStudentInfo() {
-        return studentInfo;
-    }
-
-    public void setStudentInfo(StudentInfo studentInfo) {
-        this.studentInfo = studentInfo;
-    }
-
-    public String getArtworkUrl() {
-        return artworkUrl;
-    }
-
-    public void setArtworkUrl(String artworkUrl) {
-        this.artworkUrl = artworkUrl;
-    }
-
-    public LocalDateTime getPostTimestamp(){
-    	return postTimestamp;
-    }
-
-    public void setPostTimestamp(LocalDateTime postTimestamp){
-    	this.postTimestamp = postTimestamp;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDateTime(){
-        return dateTime;
-    }
-
-    public void setDateTime(String dateTime){
-        this.dateTime = dateTime;
-    }
-
-    public String getBackground(){
-    	return background;
-    }
-
-    public void setBackground(String background){
-    	this.background = background;
-    }
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "uploaded_images", nullable = false)
+    private List<String> uploadedImages;
 }

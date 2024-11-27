@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.data.post.PostType;
 import com.example.application.data.dto.user.UserDTO;
 import com.example.application.data.dto.post.PostReactionDTO;
 import com.example.application.data.dto.post.ArtworkFeedDTO;
@@ -27,6 +28,7 @@ import com.example.application.views.story.StoryView;
 import com.example.application.views.artworks.AddArtwork;
 import com.example.application.views.story.DisplayStoryView;
 import com.example.application.views.search.SearchView;
+import com.example.application.views.utils.PostUtils;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -92,6 +94,7 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CompletableFuture;
 
 @Route(value = "", layout=MainLayout.class)
 @PermitAll
@@ -149,6 +152,7 @@ public class MainFeed extends AppLayout {
         createFooter();
     }
 
+    // Method to create a footer for the layout
     private void createFooter(){
     	Icon plusIcon = new Icon("lumo", "plus");
     	plusIcon.addClassName("feed-footer-plus-icon");
@@ -174,25 +178,22 @@ public class MainFeed extends AppLayout {
         addToNavbar(true, footerLayout);
     }
 
+    // Method to create the layout for adding new post
     private HorizontalLayout createAddPostLayout(User user){
     	Div avatarDiv = createAddPostAvatar(user);
 
-    	Button whatsOnYourMind = new Button("What's on your mind?");
+    	Button whatsOnYourMind = new Button("What's on your mind?", e -> UI.getCurrent().navigate(AddArtwork.class));
     	whatsOnYourMind.addClassName("main-feed-post-button");
-    	whatsOnYourMind.addClickListener(event -> {
-    	    UI.getCurrent().navigate(AddArtwork.class);
-    	});
 
     	Div photoDiv = new Div(new Icon("lumo", "photo"), new Span("Photo"));
     	photoDiv.addClassName("main-feed-photo-div");
 
-    	HorizontalLayout addPostLayout = new HorizontalLayout();
+    	HorizontalLayout addPostLayout = new HorizontalLayout(avatarDiv, whatsOnYourMind, photoDiv);
     	addPostLayout.addClassName("main-feed-add-layout");
-    	addPostLayout.add(avatarDiv, whatsOnYourMind, photoDiv);
-
     	return addPostLayout;
     }
 
+    // Method to create an avatar for the add post layout
     private Div createAddPostAvatar(User user) {
     	Avatar avatar = new Avatar("", user.getProfileImage());
         avatar.addClassName("main-feed-post-avatar");
@@ -204,6 +205,7 @@ public class MainFeed extends AppLayout {
 	return avatarDiv;
     }
 
+    // Method to create the story layout for current user
     private Div createOwnStory(User user){
     	List<Story> stories = storyService.getNonExpiredStoriesByUser(user.getId());
 
@@ -236,6 +238,7 @@ public class MainFeed extends AppLayout {
 	return storyDiv;
     }
 
+    // Method to create the story feed layout
     private HorizontalLayout createStoryLayout(User user) {
     	HorizontalLayout storyLayout = new HorizontalLayout();
 
@@ -254,6 +257,7 @@ public class MainFeed extends AppLayout {
     	return storyLayout;
     }
 
+    // Method to create a profile layout for the story
     private VerticalLayout createProfileLayout(User user) {
     	Image profileImage = new Image(user.getProfileImage(), "profile-image");
     	profileImage.addClassName("happening-profile-image");
@@ -271,6 +275,7 @@ public class MainFeed extends AppLayout {
     	return profileLayout;
     }
 
+    // Method to add other stories
     private void addOtherUsersStories(HorizontalLayout storyLayout, User user) {
     	List<UserDTO> users = userService.getUsersFullNameDTO();
     	users.forEach(_user -> {
@@ -291,6 +296,7 @@ public class MainFeed extends AppLayout {
     	});
     }
 
+    // Method to create story layout for each user's story
     private Div createStoryDiv(Story story, int storyCount) {
     	Div storyDiv = new Div();
     	storyDiv.addClassName("happenings-feed");
@@ -313,46 +319,138 @@ public class MainFeed extends AppLayout {
 
     public void loadPosts() {
     	List<ArtworkFeedDTO> artworks = artworkService.getArtworkFeedDTOs(currentPage * PAGE_SIZE, PAGE_SIZE);
-        /*// Create an IFrame component
-        IFrame iframe = new IFrame("https://www.youtube.com/embed/dQw4w9WgXcQ");
-        iframe.setWidth("560px");
-        iframe.setHeight("315px");
-        iframe.getElement().setAttribute("frameborder", "0");
-        iframe.getElement().setAttribute("allowfullscreen", "true");*/
 
     	for (ArtworkFeedDTO artwork : artworks) {
-    	     String background = artwork.getArtworkBackground();
-
-    	     if (background == null) {
-    	     	 createArtworkPost(artwork);
-    	     } else {
-    	         createPostOnly(artwork);
-    	     }
+    	    switch (artwork.getPostType()) {
+    	    	case IMAGE:
+        	    createPost(artwork, getImageContent(artwork));
+        	    break;
+    	    	case TEXT_BACKGROUND:
+        	    createPost(artwork, getTextBackgroundContent(artwork));
+        	    break;
+    		case VIDEO:
+        	    createPost(artwork, getVideoContent(artwork));
+        	    break;
+    		case TEXT:
+        	    createPost(artwork, getTextContent(artwork));
+        	    break;
+    		default:
+        	    // handle unknow post type
+        	    break;
+	    }
     	}
     	currentPage++;
     }
 
-    private void createPostOnly(ArtworkFeedDTO artwork){
-    	Avatar avatar = new Avatar("", artwork.getUserProfileImage());
-    	avatar.addClassName("feed-only-avatar");
+    private Span getTextContent(ArtworkFeedDTO artwork) {
+    	Span text = new Span(artwork.getArtworkDescription());
+    	text.addClassName("post-description");
+    	return text;
+    }
 
-    	Span timeAgo = createTimeAgo(artwork);
+    private Component getImageContent(ArtworkFeedDTO artwork) {
+    	List<String> uploadedImages = artwork.getUploadedImages();
 
-    	Div nameDiv = new Div(new Span(artwork.getUserFullName()), timeAgo);
-    	nameDiv.addClassName("feed-only-name-div");
+	if (uploadedImages.size() <= 1) {
+	    Image image = new Image(artwork.getArtworkUrl(), "artwork-image");
+            image.addClassName("main-feed-image");
+            return image;
+	}
 
-    	Icon moreIcon = new Icon("vaadin", "ellipsis-dots-h");
-    	moreIcon.addClassName("feed-only-more-icon");
+	Map<Integer, String> sizeMap = Map.of(
+	    	1, "one",
+	    	2, "two",
+	    	3, "three",
+	    	4, "four",
+	    	5, "five"
+	);
 
-    	Icon closeIcon = new Icon("lumo", "cross");
-    	closeIcon.addClassName("feed-only-close-icon");
+	int uploadedImagesSize = uploadedImages.size();
+	String size = sizeMap.getOrDefault(uploadedImagesSize, "more");
 
-    	HorizontalLayout headerLayout = new HorizontalLayout(avatar, nameDiv, new Div(moreIcon, closeIcon));
-    	headerLayout.addClassName("feed-only-header-layout");
+	Div mainLayout = new Div(); // Main layout container
 
+	// First row layout
+	HorizontalLayout firstRow = new HorizontalLayout();
+	firstRow.addClassName("image-row-" + size);
+
+	// Second row layout
+	HorizontalLayout secondRow = new HorizontalLayout();
+	secondRow.addClassName("image-row-" + size);
+
+	// Add images to the first and second rows
+	for (int i = 0; i < uploadedImagesSize; i++) {
+	    String uploadedImage = uploadedImages.get(i);
+
+	    Image image = new Image(uploadedImage, "Image " + (i + 1));
+	    image.addClassName("uploaded-image");
+
+	    Div imageDiv = new Div();
+	    imageDiv.addClassName("image-container");
+	    imageDiv.add(image);
+	    imageDiv.addClickListener(event -> {
+	    	ViewPostImage postImage = new ViewPostImage(formLayout, artwork);
+	    	postImage.open();
+	    });
+
+	    if (i < 2) {
+	        // First two images go into the first row
+	        firstRow.add(imageDiv);
+	    } else if (i < 5) {
+	        // Next three images go into the second row
+	        if (i == 4 && uploadedImagesSize > 5) {
+	            // Add remaining count to the 5th image
+	            Span remainingCount = new Span("+" + (uploadedImagesSize - 5));
+	            remainingCount.addClassName("remaining-count");
+	            imageDiv.add(remainingCount);
+	        }
+	        secondRow.add(imageDiv);
+	    }
+
+	    // Stop processing after the 5th image
+	    if (i == 4) {
+	        break;
+	    }
+	}
+
+	// Add rows to the main layout
+	mainLayout.add(firstRow, secondRow);
+	return mainLayout;
+    }
+
+    private Div getTextBackgroundContent(ArtworkFeedDTO artwork) {
     	Div content = new Div(new Span(artwork.getArtworkDescription()));
-    	content.addClassName("feed-only-content");
-	setContentBackground(artwork, content);
+        content.addClassName("feed-only-content");
+        setContentBackground(artwork, content);
+        return content;
+    }
+
+    private IFrame getVideoContent(ArtworkFeedDTO artwork) {
+    	IFrame video = new IFrame(artwork.getArtworkUrl());
+        video.getElement().setAttribute("frameborder", "0");
+        video.getElement().setAttribute("allowfullscreen", "true");
+        return video;
+    }
+
+    private void createPost(ArtworkFeedDTO artwork, Component content) {
+    	Avatar avatar = new Avatar("", artwork.getUserProfileImage());
+        avatar.addClassName("feed-only-avatar");
+
+        Span timeAgo = createTimeAgo(artwork);
+
+        Div nameDiv = new Div(new Span(artwork.getUserFullName()), timeAgo);
+        nameDiv.addClassName("feed-only-name-div");
+
+        Icon moreIcon = new Icon("vaadin", "ellipsis-dots-h");
+        moreIcon.addClassName("feed-only-more-icon");
+
+        Icon closeIcon = new Icon("lumo", "cross");
+        closeIcon.addClassName("feed-only-close-icon");
+
+        HorizontalLayout headerLayout = new HorizontalLayout(avatar, nameDiv, new Div(moreIcon, closeIcon));
+        headerLayout.addClassName("feed-only-header-layout");
+
+        //IFrame video = new IFrame("https://www.youtube.com/embed/dQw4w9WgXcQ");
 
         Span commentsSpan = new Span();
 
@@ -384,9 +482,32 @@ public class MainFeed extends AppLayout {
              formLayout.remove(headerLayout, content, reactionsLayout, buttonsLayout);
         });
 
-    	formLayout.add(headerLayout, content, reactionsLayout, buttonsLayout);
+        Span description = getDescription(artwork);
+        description.addClassName("post-description");
+
+        CustomEvent.handleLongPressEvent(description);
+        description.getElement().addEventListener("long-press", e -> copyText(artwork));
+
+        formLayout.add(headerLayout, description, content, reactionsLayout, buttonsLayout);
     }
 
+    private void copyText(ArtworkFeedDTO artwork) {
+    	PostUtils postUtils = new PostUtils();
+    	BottomSheet sheet = postUtils.createCopyTextSheet(artwork.getArtworkDescription());
+    	formLayout.add(sheet);
+    	sheet.open();
+    }
+
+    private Span getDescription(ArtworkFeedDTO artwork) {
+    	Span description = new Span();
+    	description.addClassName("post-description");
+    	if (artwork.getArtworkBackground() == null && (!artwork.getArtworkDescription().isEmpty() || artwork.getArtworkDescription() != null)) {
+            return new Span(artwork.getArtworkDescription());
+        }
+        return new Span();
+    }
+
+    // Method to create a timestamp for the post
     private Span createTimeAgo(ArtworkFeedDTO artwork) {
     	Span timeAgo = new Span();
         timeAgo.addClassName("feed-only-time");
@@ -395,6 +516,7 @@ public class MainFeed extends AppLayout {
         return timeAgo;
     }
 
+    // Method to create a comment button
     private Button createCommentButton(ArtworkFeedDTO artwork, Span commentsSpan) {
     	Button commentButton = new Button(new Icon("vaadin", "comment-o"), e -> {
             VaadinSession.getCurrent().getSession().setAttribute("main", artwork.getArtworkId());
@@ -411,6 +533,7 @@ public class MainFeed extends AppLayout {
         return commentButton;
     }
 
+    // Method to create 3 top reaction icons with most reactions
     private Div createReactionsLayout(ArtworkFeedDTO artwork, FormLayout formLayout, Span totalReactions, Span commentsSpan) {
     	Div reactionsLayout = new Div(getMostReactions(artwork.getArtworkId(), totalReactions), commentsSpan);
         reactionsLayout.addClassName("feed-only-reactions-layout");
@@ -421,6 +544,7 @@ public class MainFeed extends AppLayout {
         return reactionsLayout;
     }
 
+    // Method to get 3 top reaction icons
     private Div getMostReactions(Long artworkId, Span totalReactions) {
         List<PostReactionDTO> topReactions = postService.getTopReactionsByArtworkId(artworkId).getContent();
 
@@ -431,6 +555,7 @@ public class MainFeed extends AppLayout {
     	return reactionsDiv;
     }
 
+    // Method to get reaction icon
     private SvgIcon getIcon(String reactType) {
         Map<String, SvgIcon> reactionIcons = Map.of(
             "like", new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))),
@@ -447,174 +572,13 @@ public class MainFeed extends AppLayout {
         return icon;
     }
 
+    // Method to set a background for post
     private void setContentBackground(ArtworkFeedDTO artwork, Div content) {
     	String background = artwork.getArtworkBackground();
 
         if (background != null){
             content.getStyle().set("background", background);
         }
-    }
-
-    private void createArtworkPost(ArtworkFeedDTO artwork){
-    	String imageUrl = artwork.getArtworkUrl();
-
-	Image image = new Image(imageUrl, "artwork-image");
-        image.addClassName("main-feed-image");
-
-        User currentUser = userService.findCurrentUser();
-
-        Span commented = new Span();
-        commented.addClassName("commented");
-
-        Span totalReactions = new Span();
-        totalReactions.addClassName("reacted");
-
-        Span likes = new Span();
-        likes.addClassName("specific-reacts");
-
-        Span hearts = new Span();
-        hearts.addClassName("specific-reacts");
-
-        Span smiles = new Span();
-        smiles.addClassName("specific-reacts");
-
-        Button likeButton = new Button();
-        likeButton.addClassName("feed-reaction");
-        likeButton.getStyle().set("color", "white");
-        likeButton.setIcon(new Icon(VaadinIcon.THUMBS_UP_O));
-
-        Icon likeIcon = new Icon(VaadinIcon.THUMBS_UP);
-        likeIcon.addClassName("reactions-like");
-
-        Icon heartIcon = new Icon(VaadinIcon.HEART);
-        heartIcon.addClassName("reactions-heart");
-
-        Icon happyIcon = new Icon(VaadinIcon.SMILEY_O);
-        happyIcon.addClassName("reactions-happy");
-
-	PostReactionsView reactionsView = new PostReactionsView(
-		notificationService,
-	  	artworkService,
-		postService,
-		userService,
-        	likeButton,
-        	totalReactions,
-        	artwork
-	);
-	//reactionsView.showReactions(likeIcon, heartIcon, happyIcon, likes, hearts, smiles);
-
-        Button commentButton = createCommentButtonListener(artwork);
-        Button shareButton = new Button("7262", new Icon(VaadinIcon.ARROW_FORWARD));
-        shareButton.addClassName("feed-heart");
-
-        HorizontalLayout buttonsLayout = new HorizontalLayout(likeButton, commentButton, shareButton);
-        buttonsLayout.addClassName("main-feed-buttons");
-
-        VerticalLayout profileLayout = createFeedHeader(artwork);
-        profileLayout.addClassName("comment-user-header-layout");
-
-        //List<PostReactionDTO> reactions = postService.getReactionsDTO(artwork.getArtworkId());
-
-        HorizontalLayout totalReactionsDiv = new HorizontalLayout();//createTotalReactions(reactions, commented, artwork, totalReactions, likes, hearts, smiles, likeIcon, heartIcon, happyIcon);
-        totalReactionsDiv.addClassName("comment-reactions-div");
-        totalReactionsDiv.addClickListener(event -> {
-	});
-
-        formLayout.add(profileLayout, image, totalReactionsDiv, buttonsLayout);
-    }
-
-    public HorizontalLayout createTotalReactions(List<PostReactionDTO> reactions, Span commented, ArtworkFeedDTO artwork,
-    	Span totalReactions, Span likes, Span hearts, Span smiles, Icon likeIcon, Icon heartIcon, Icon happyIcon){
-    	int totalLikes = 0;
-	int totalHearts = 0;
-	int totalSmiles = 0;
-
-    	for(PostReactionDTO reaction : reactions){
-    	    if(reaction.getReactType().equals("Like")){
-    	       totalLikes++;
-    	    }else if(reaction.getReactType().equals("Heart")){
-    	       totalHearts++;
-    	    }else if(reaction.getReactType().equals("Happy")){
-    	       totalSmiles++;
-    	    }
-    	}
-
-    	likes.setText(formatValue(totalLikes, false));
-    	hearts.setText(formatValue(totalHearts, false));
-    	smiles.setText(formatValue(totalSmiles, false));
-
-        if(totalLikes == 0){
-           likeIcon.setVisible(false);
-           likes.setVisible(false);
-        }
-
-	if(totalHearts == 0){
-           heartIcon.setVisible(false);
-           hearts.setVisible(false);
-        }
-
-        if(totalSmiles == 0){
-           happyIcon.setVisible(false);
-           smiles.setVisible(false);
-        }
-
-        Long totals = (long) reactions.size();
-
-        totalReactions.setText(formatValue(totals, true));
-
-	Long totalComments = artwork.getCommentsCount();
-        commented.setText(formatValue(totalComments, true) + " comments");
-
-        HorizontalLayout reactionsDiv = new HorizontalLayout(likeIcon,likes, heartIcon,hearts,  happyIcon, smiles); //commented, totalReactions
-        reactionsDiv.addClassName("comment-reactions-div");
-
-        return reactionsDiv;
-    }
-
-    private VerticalLayout createFeedHeader(ArtworkFeedDTO artwork){
-        Avatar avatar = new Avatar("", artwork.getUserProfileImage());
-        avatar.addClassName("profile-user-avatar");
-
-        Div avatarDiv = new Div(avatar);
-
-        Span name = new Span(artwork.getUserFullName());
-        name.addClassName("profile-user-fullname");
-
-        Span title = new Span(artwork.getArtworkDescription());
-        title.addClassName("comment-title");
-
-        Span dateTime = new Span("2024-09-07 09:09:01");
-        dateTime.addClassName("comment-date-time");
-
-        HorizontalLayout layout = new HorizontalLayout(avatarDiv, name);
-        layout.addClassName("comment-user-layout");
-        layout.addClickListener(event -> {
-            UI.getCurrent().navigate(UserProfile.class, artwork.getUserId());
-        });
-
-        return new VerticalLayout(layout, dateTime, title);
-    }
-
-    public Button createCommentButtonListener(ArtworkFeedDTO artwork){
-	Long totalComments = artwork.getCommentsCount();
-
-    	Button commentButton = new Button();
-	commentButton.addClassName("feed-comment");
-	commentButton.setIcon(new Icon(VaadinIcon.COMMENT_ELLIPSIS_O));
-	commentButton.setText(formatValue(totalComments, false));
-	commentButton.addClickListener(event -> {
-            Long artworkId = artwork.getArtworkId();
-            VaadinSession.getCurrent().getSession().setAttribute("main", artworkId);
-            UI.getCurrent().navigate(CommentSectionView.class, artworkId);
-	});
-
-	return commentButton;
-    }
-
-    public String checkUser() {
-        Authentication auth =
-            SecurityContextHolder.getContext().getAuthentication();
-        return auth == null ? null : auth.getName();
     }
 
     private String formatValue(long value, boolean includeDecimal) {

@@ -177,7 +177,7 @@ public class PostReactionsView {
             likeButton.setText(formatValue(totalReacts.get(), false));
         } else {
             likeButton.setText("");
-            reacts.setText("");
+            reacts.setVisible(false);
         }
     }
 

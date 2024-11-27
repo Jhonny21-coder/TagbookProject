@@ -24,7 +24,9 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
             	CONCAT(u.firstName, ' ', u.lastName),
             	u.profileImage,
             	a.artworkUrl,
-            	(SELECT COUNT(c) FROM Comment c WHERE c.artwork.id = a.id)
+            	(SELECT COUNT(c) FROM Comment c WHERE c.artwork.id = a.id),
+            	a.postType,
+            	a.uploadedImages
             )
     	FROM Artwork a
     	JOIN a.user u
@@ -43,7 +45,8 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
                 CONCAT(u.firstName, ' ', u.lastName),
                 u.profileImage,
                 a.artworkUrl,
-                (SELECT COUNT(c) FROM Comment c WHERE c.artwork.id = a.id)
+                (SELECT COUNT(c) FROM Comment c WHERE c.artwork.id = a.id),
+                a.postType
             )
         FROM Artwork a
         JOIN a.user u

@@ -42,7 +42,13 @@ public class PeopleWhoReactedView extends AppLayout {
     	this.artworkId = artworkId;
     	this.postService = postService;
     	addClassName("people-reacted-app-layout");
-    	getStyle().set("transform", "translateY(0)").set("position", "fixed").set("top", "0").set("bottom", "0").set("left", "0").set("right", "0").set("width", "100vw").set("z-index", "99999").set("background", "var(--primary)");
+    	getStyle().set("transform", "translateY(0)")
+    		  .set("position", "fixed")
+    		  .set("top", "0").set("bottom", "0")
+    		  .set("left", "0").set("right", "0")
+    		  .set("width", "100vw")
+    		  .set("z-index", "99999")
+    		  .set("background", "var(--primary)");
 
 	createHeader();
 	loadReactionCounts();

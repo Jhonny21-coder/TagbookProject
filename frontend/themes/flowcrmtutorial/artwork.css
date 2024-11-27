@@ -1,4 +1,4 @@
-vaadin-upload.artwork-upload > vaadin-button {
+/*vaadin-upload.artwork-upload > vaadin-button {
   display: flex;
   padding-left: 15px;
   width: 100%;
@@ -8,17 +8,30 @@ vaadin-upload.artwork-upload > vaadin-button {
   margin-top: 10px;
   border-radius: 20px;
   font-size: 11px;
-}
-
-.artwork-upload vaadin-upload-file::part(remove-button) {
-  color: var(--lumo-error-color);
-}
-
-/*.artwork-upload vaadin-upload-file::part(done-icon),
-.artwork-upload vaadin-upload-file[uploading]
-.register-upload vaadin-upload-file::part(name) {
-  display: none;
 }*/
+
+.artwork-upload {
+  z-index: 0;
+}
+
+.artwork-upload vaadin-upload-file,
+.artwork-upload vaadin-upload-file::part(meta),
+.artwork-upload vaadin-upload-file::part(done-icon),
+.artwork-upload vaadin-upload-file[uploading],
+.register-upload vaadin-upload-file::part(name),
+.artwork-upload vaadin-upload-file::part(remove-button),
+.artwork-upload vaadin-upload-file::part(name),
+.artwork-upload > vaadin-button[disabled],
+.artwork-upload vaadin-upload-file-list::part(list),
+.artwork-upload vaadin-upload-file-list {
+  all: unset;
+  position: absolute;
+  transform: translateY(100%);
+  display: none;
+  border: none;
+  width: 10px;
+  margin: 0;
+}
 
 vaadin-icon.main-artwork-icons:nth-child(1){
   background: var(--lumo-primary-color);

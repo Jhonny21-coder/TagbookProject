@@ -1,7 +1,9 @@
 package com.example.application.data.dto.post;
 
-import java.time.LocalDateTime;
+import com.example.application.data.post.PostType;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,4 +21,6 @@ public class ArtworkFeedDTO {
     private String artworkUrl;
 
     private Long commentsCount;
+    private PostType postType;
+    private List<String> uploadedImages;
 }

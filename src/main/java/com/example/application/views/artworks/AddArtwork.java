@@ -1,5 +1,6 @@
 package com.example.application.views.artworks;
 
+import com.example.application.data.post.PostType;
 import com.example.application.views.UploadsI18N;
 import com.example.application.views.MainFeed;
 import com.example.application.views.MainLayout;
@@ -10,6 +11,7 @@ import com.example.application.services.UserServices;
 import com.example.application.data.Artwork;
 import com.example.application.services.ArtworkService;
 import com.example.application.config.CloudinaryService;
+import com.example.application.views.BottomSheet;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -21,6 +23,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.*;
@@ -58,6 +61,10 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 @PermitAll
 @Route("addArtwork")
@@ -70,268 +77,327 @@ public class AddArtwork extends AppLayout {
 
     private final String ARTWORK_FOLDER = "artwork_images";
 
-    private final Span artworkUrlText = new Span("Artwork Image");
-    private final Upload upload = new Upload(new MemoryBuffer());
-    private final Image uploadedImage = new Image();
-    private final TextArea title = new TextArea();
-    private final Button save = new Button("Save");
-    private final Button close = new Button("Cancel");
-    private String originalFilename;
-    private final Span postButton = new Span("POST");
-    private final Button mainPostButton = new Button("POST");
+    private MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+    private Upload upload = new Upload(buffer);
 
+    private TextArea title = new TextArea();
+    private Span postButton = new Span("POST");
+    private Button mainPostButton = new Button("POST");
+    private FormLayout mainLayout = new FormLayout();
+    private Div imageDiv = new Div();
+    private Tabs backgroundTabs;
     private String background = "";
 
-    public AddArtwork(StudentInfoService studentInfoService, UserServices userService,
-		ArtworkService artworkService, CloudinaryService cloudinaryService) {
+    public AddArtwork(StudentInfoService studentInfoService, UserServices userService, ArtworkService artworkService, CloudinaryService cloudinaryService) {
         this.studentInfoService = studentInfoService;
 	this.userService = userService;
 	this.artworkService = artworkService;
 	this.cloudinaryService = cloudinaryService;
-
-	createHeader();
-
 	addClassName("add-artwork-app-layout");
 
-	uploadedImage.setVisible(false);
-
 	title.setPlaceholder("What's on your mind?");
-
-	artworkUrlText.addClassName("add-text");
-	upload.addClassName("artwork-upload");
 	title.addClassName("add-artwork-area");
-	uploadedImage.addClassName("uploaded-image");
+	upload.addClassName("artwork-upload");
 	mainPostButton.addClassName("add-main-post-button");
+	imageDiv.addClassName("add-post-image-div");
 
-	save.addClassName("save-artwork");
-	save.setIcon(new Icon(VaadinIcon.CHECK));
-
-	close.addClassName("close-artwork");
-        close.setIcon(new Icon(VaadinIcon.CLOSE));
-
-	HorizontalLayout uploadLayout = new HorizontalLayout();
-	uploadLayout.setSpacing(false);
-        uploadLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-	Icon uploadIcon = VaadinIcon.FILE_ADD.create();
-
-        // Create the text
-        Span hint = new Span("Accepted images formats: (png, jpeg)");
-        Span hint2 = new Span(")");
-        hint.addClassName("hint");
-        hint2.addClassName("hin2");
-
-        Span uploadLabel = new Span("Upload artwork (");
-
-        // Add both the icon and text to the HorizontalLayout
-        uploadLayout.add(uploadIcon, uploadLabel, hint, hint2);
-
-        // Create the button and set the uploadLayout as its component
-        Button uploadButton = new Button();
-        uploadButton.getElement().appendChild(uploadLayout.getElement());
-
-        // Set the uploadButton as the upload button
-        upload.setUploadButton(uploadButton);
-
-        int maxFileSizeInBytes = 10 * 1024 * 1024; // 10MB
-
-        upload.addFileRejectedListener(event -> {
-            String errorMessage = event.getErrorMessage();
-
-            Notification notification = Notification.show(errorMessage, 5000,
-                    Notification.Position.MIDDLE);
-            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        });
-
-        UploadsI18N i18n = new UploadsI18N();
-        i18n.getError().setFileIsTooBig("The image exceeds the maximum allowed size of 10MB.");
-        i18n.getError().setIncorrectFileType("The provided image does not have the correct format (PNG or JPEG).");
-
-        upload.setI18n(i18n);
-        upload.setMaxFileSize(maxFileSizeInBytes);
-        upload.setAcceptedFileTypes("image/png", "image/jpeg");
-        upload.addSucceededListener(event -> {
-            MemoryBuffer buffer = (MemoryBuffer) upload.getReceiver();
-
-            try {
-                InputStream inputStream = buffer.getInputStream();
-                byte[] bytes = inputStream.readAllBytes();
-                originalFilename = event.getFileName();
-                StreamResource resource = new StreamResource(originalFilename, () -> new ByteArrayInputStream(bytes));
-                uploadedImage.setSrc(resource);
-                uploadedImage.setVisible(true);
-            } catch (IOException e) {
-                Notification.show("Error uploading artwork image", 3000, Notification.Position.TOP_CENTER);
-            }
-        });
-
-	upload.getElement().addEventListener("upload-abort", new DomEventListener() {
-	    @Override
-            public void handleEvent(DomEvent domEvent) {
-                uploadedImage.setSrc("");
-                uploadedImage.setVisible(false);
-
-                originalFilename = null;
-            }
-	});
+	createHeader();
+	configureUpload();
 
         postButton.addClickListener(event -> {
             MemoryBuffer buffer = (MemoryBuffer) upload.getReceiver();
+            String emailValue = userService.findCurrentUser().getEmail();
+            String titleValue = title.getValue();
+            boolean hasBackground = background != null && !background.isEmpty();
+            boolean hasTitle = titleValue != null && !titleValue.isEmpty();
 
-            User user = userService.findCurrentUser();
-
-            if (user != null) {
-		String emailValue = user.getEmail();
-
-                if (originalFilename != null && !title.getValue().isEmpty()) {
-                    try (InputStream inputStream = buffer.getInputStream()) {
-                         // Create a temporary file to store the uploaded image
-        		File tempFile = File.createTempFile("tempImage", ".png");
-        		tempFile.deleteOnExit(); // Ensure the file is deleted on exit
-
-        		// Save the uploaded image to the temporary file
-        		FileOutputStream fos = new FileOutputStream(tempFile);
-            		byte[] imageBytes = inputStream.readAllBytes();
-            		fos.write(imageBytes);
-
-                    	String imageUrl = cloudinaryService.uploadImage(tempFile, ARTWORK_FOLDER);
-
-                    	artworkService.saveArtwork(emailValue, imageUrl, title.getValue());
-
-                    	Notification.show("Artwork saved successfully", 1000, Notification.Position.TOP_CENTER)
-				.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-		    	UI.getCurrent().navigate(MainFeed.class);
-		    }catch(Exception e){
-		        System.out.println(e.getMessage());
-		    }
-                }
-
-                if(originalFilename == null && title.getValue().isEmpty()){
-                    Notification.show("Both fields cannot be empty", 1000, Notification.Position.MIDDLE)
-			.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                } else if(title.getValue().isEmpty() && originalFilename != null){
-                    Notification.show("Title cannot be empty", 1000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                }else if((originalFilename == null || originalFilename.isEmpty()) && !title.getValue().isEmpty()){
-                    Notification.show("Image cannot be empty", 1000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                }
-            } else {
-                Notification.show("User not found", 1000, Notification.Position.TOP_CENTER)
-			.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            if (!hasTitle) {
+                Notification.show("Title cannot be empty", 1000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
             }
+
+            if (hasBackground) {
+                PostType postType = background.equalsIgnoreCase("white") ? PostType.TEXT : PostType.TEXT_BACKGROUND;
+                artworkService.savePost(emailValue, titleValue, background, postType);
+                UI.getCurrent().navigate(MainFeed.class);
+                return;
+            }
+
+            postImage(emailValue, titleValue);
         });
 
-	Div imageDiv = new Div(uploadedImage);
-	imageDiv.addClassName("uploaded-image");
+	// Background Tabs
+	backgroundTabs = createBackgroundTabs();
 
-	FormLayout formLayout = new FormLayout();
-        formLayout.add(createProfileHeader(), title, createBackgroundTabs(), mainPostButton);
+	mainLayout.addClassName("add-post-main-layout");
+        mainLayout.add(createProfileHeader(), title, backgroundTabs, createOtherActions());
 
-	VerticalLayout artworksDiv = new VerticalLayout(formLayout);
+	VerticalLayout artworksDiv = new VerticalLayout(mainLayout);
 	setContent(artworksDiv);
-   }
+    }
 
-   private Tabs createBackgroundTabs() {
-   	Tab white = new Tab(new Div());
-   	Tab purple = new Tab(new Div());
-   	Tab red = new Tab(new Div());
-   	Tab black = new Tab(new Div());
-   	Tab gradient1 = new Tab(new Div());
-   	Tab gradient2 = new Tab(new Div());
-   	Tab gradient3 = new Tab(new Div());
-   	Tab gradient4 = new Tab(new Div());
+    private void configureUpload() {
+    	int maxFileSizeInBytes = 1024 * 1024 * 1024; // 1GB
+    	upload.setMaxFileSize(maxFileSizeInBytes);
+    	upload.setAcceptedFileTypes("image/png", "image/jpeg", "image/jpg", "video/mp4");
+    	upload.addSucceededListener(event -> {
+    	    String fileName = event.getFileName(); // Get the current file
+    	    try {
+            	InputStream inputStream = buffer.getInputStream(fileName);
+            	byte[] bytes = inputStream.readAllBytes();
 
-   	Tabs tabs = new Tabs(white, purple, red, black, gradient1, gradient2, gradient3, gradient4);
-   	tabs.addClassName("add-artwork-backgroun-tabs");
-   	tabs.addSelectedChangeListener(event -> {
-   	    if (tabs.getSelectedTab().equals(white)) {
-		title.setClassName("white-area");
-		title.removeThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
+        	StreamResource resource = new StreamResource(fileName, () -> new ByteArrayInputStream(bytes));
 
-		background = "#333436";
-	    } else if (tabs.getSelectedTab().equals(purple)) {
-	        title.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
-	        title.addClassNames(LumoUtility.JustifyContent.CENTER);
-		title.setClassName("purple-area");
+	        Image image = new Image(resource, fileName);
+	        image.addClassName("add-post-image");
 
-		background = "#C500FF";
-            } else if (tabs.getSelectedTab().equals(red)) {
-                title.setClassName("red-area");
-                title.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
-                title.addClassNames(LumoUtility.JustifyContent.CENTER);
+	        EditImage editImage = new EditImage(mainLayout);
+                editImage.addClassName("add-artwork-edit-main");
 
-                background = "#E2013B";
-            } else if (tabs.getSelectedTab().equals(black)) {
-                title.setClassName("black-area");
-                title.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
-                title.addClassNames(LumoUtility.JustifyContent.CENTER);
+                Image imageToEdit = new Image(resource, fileName);
+                configureEditImage(editImage, imageToEdit);
 
-                background = "black";
-            }
-   	});
+		Icon editIcon = new Icon("vaadin", "pencil");
+		editIcon.addClickListener(e -> editImage.open());
+
+		Icon removeIcon = new Icon("vaadin", "trash");
+
+		Div clickableImage = new Div(image);
+		clickableImage.addClickListener(e -> editImage.open());
+
+		Div wrappedImage = new Div(clickableImage, new Div(editIcon, removeIcon));
+
+		BottomSheet bottomSheet = createBottomSheet(resource, wrappedImage, fileName);
+
+		removeIcon.addClickListener(e -> {
+		    bottomSheet.open();
+		});
+
+		imageDiv.add(wrappedImage);
+	        mainLayout.add(bottomSheet);
+	    } catch (IOException e) {
+	        Notification.show("Error uploading artwork image", 3000, Notification.Position.TOP_CENTER);
+	    }
+
+	    mainLayout.remove(backgroundTabs);
+	    mainLayout.addComponentAtIndex(2, imageDiv);
+	});
+
+	upload.addAllFinishedListener(event -> {
+	    title.setClassName("add-post-text-area-with-image");
+	});
+    }
+
+    // Method to configure layout for editing the image
+    private void configureEditImage(EditImage editImage, Image imageToEdit) {
+    	Icon closeIcon = new Icon("lumo", "cross");
+    	closeIcon.addClickListener(event -> editImage.close());
+
+    	Div stickersDiv = createEditAction("stickers", "Stickers");
+    	Div textDiv = createEditAction("text", "Text");
+
+    	editImage.setHeader(
+    	    new HorizontalLayout(
+    	    	closeIcon,
+    	    	new Div(stickersDiv, textDiv)
+    	    )
+    	);
+
+    	editImage.addContent(imageToEdit);
+
+    	editImage.setFooter(
+    	    new Div(
+    	    	new Button("Done", e -> {
+    	    	    editImage.close();
+    		})
+    	    )
+    	);
+    }
+
+    // Method to create an action for editing image
+    private Div createEditAction(String iconName, String text) {
+    	return new Div(new Span(text), getIcon(iconName));
+    }
+
+    // Method to create a Bottom Sheet for to confirm removing the image
+    private BottomSheet createBottomSheet(StreamResource resource, Div wrappedImage, String fileName) {
+    	BottomSheet bottomSheet = new BottomSheet();
+
+    	Image imageToRemove = new Image(resource, "");
+
+    	Div informationDiv = new Div(new Span("Remove photo?"), new Span("You'll lose this picture and any changes you've made to it."));
+    	Div imageInformationDiv = new Div(imageToRemove, informationDiv);
+
+    	Div lineDiv = new Div();
+
+    	Div keepEditingDiv = new Div(new Icon("vaadin", "pencil"), new Span("Keep editing"));
+    	keepEditingDiv.addClickListener(event -> bottomSheet.close());
+
+    	Div removePhotoDiv = new Div(new Icon("vaadin", "trash"), new Span("Remove photo"));
+    	removePhotoDiv.addClickListener(event -> {
+    	    imageDiv.remove(wrappedImage);
+            buffer.getFiles().remove(fileName);
+    	    bottomSheet.close();
+
+    	    if (buffer.getFiles().size() < 1) {
+    	    	mainLayout.remove(imageDiv);
+            	mainLayout.addComponentAtIndex(2, backgroundTabs);
+            	title.setClassName("add-artwork-area");
+    	    }
+    	});
+
+    	Div mainDiv = new Div(imageInformationDiv, lineDiv, keepEditingDiv, removePhotoDiv);
+    	mainDiv.addClassName("add-post-remove-main-div");
+
+    	bottomSheet.addContent(mainDiv);
+    	return bottomSheet;
+    }
+
+    /*private Div createOtherActions() {
+    	Div actionsDiv = new Div(
+            createActionDiv("photos", "Photos/videos"),
+            createActionDiv("tag-people", "Tag people"),
+            createActionDiv("location", "Add location"),
+            createActionDiv("feeling", "Feeling/activity"),
+            createActionDiv("event", "Create event"),
+            createActionDiv("live", "Go live"),
+            mainPostButton
+    	);
+    	actionsDiv.addClassName("add-post-actions-div");
+    	return actionsDiv;
+    }*/
+
+    private Div createActionDiv(String iconName, String text) {
+    	Div actionDiv = new Div(getIcon(iconName), new Span(text));
+    	return actionDiv;
+    }
+
+    private Div createOtherActions() {
+   	Div photosDiv = new Div(getIcon("photos"), new Span("Photos/videos"));
+
+   	Button uploadButton = new Button();
+   	uploadButton.addClassName("post-add-photos-button");
+        uploadButton.getElement().appendChild(photosDiv.getElement());
+	upload.setUploadButton(uploadButton);
+
+   	Div tagPeopleDiv = new Div(getIcon("tag-people"), new Span("Tag people"));
+   	Div locationDiv = new Div(getIcon("location"), new Span("Add location"));
+   	Div feelingDiv = new Div(getIcon("feeling"), new Span("Feeling/activity"));
+   	Div eventDiv = new Div(getIcon("event"), new Span("Create event"));
+   	Div liveDiv = new Div(getIcon("live"), new Span("Go live"));
+
+   	Div actionsDiv = new Div(upload, tagPeopleDiv, locationDiv, feelingDiv, eventDiv, liveDiv, mainPostButton);
+   	actionsDiv.addClassName("add-post-actions-div");
+   	return actionsDiv;
+    }
+
+    private SvgIcon getIcon(String iconName) {
+        return new SvgIcon(new StreamResource(iconName + ".svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/" + iconName + ".svg")));
+    }
+
+    private Tabs createBackgroundTabs() {
+   	// Create an array of tab data with corresponding styles and backgrounds
+	TabData[] tabData = {
+	    new TabData(new Tab(new Div()), "white-area", "white", false),
+	    new TabData(new Tab(new Div()), "purple-area", "#C500FF", true),
+	    new TabData(new Tab(new Div()), "red-area", "#E2013B", true),
+	    new TabData(new Tab(new Div()), "black-area", "black", true),
+	    new TabData(new Tab(new Div()), "gradient1-area", "1", true),
+	    new TabData(new Tab(new Div()), "gradient2-area", "2", true),
+	    new TabData(new Tab(new Div()), "gradient3-area", "3", true),
+	    new TabData(new Tab(new Div()), "gradient4-area", "4", true)
+	};
+
+	// Create tabs dynamically
+	Tabs tabs = new Tabs(Arrays.stream(tabData).map(data -> data.tab).toArray(Tab[]::new));
+	tabs.addClassName("add-artwork-background-tabs");
+
+	background = "white"; // Default background value
+
+	// Add a listener to update the style based on the selected tab
+	tabs.addSelectedChangeListener(event -> {
+	    Tab selectedTab = tabs.getSelectedTab();
+
+	    for (TabData data : tabData) {
+	        if (data.tab.equals(selectedTab)) {
+	            title.setClassName(data.cssClass);
+	            background = data.background;
+
+	            if (data.centerAlign) {
+	                title.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
+	                title.addClassNames(LumoUtility.JustifyContent.CENTER);
+	            } else {
+	                title.removeThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
+	                title.removeClassNames(LumoUtility.JustifyContent.CENTER);
+	            }
+	            break;
+	        }
+	    }
+	});
 
    	mainPostButton.addClickListener(event -> {
-            MemoryBuffer buffer = (MemoryBuffer) upload.getReceiver();
+    	    String emailValue = userService.findCurrentUser().getEmail();
+    	    String titleValue = title.getValue();
+    	    boolean hasBackground = !background.equals("white");
+    	    boolean hasTitle = titleValue != null && !titleValue.isEmpty();
 
-            User user = userService.findCurrentUser();
+    	    if (!hasTitle) {
+        	Notification.show("Title cannot be empty", 1000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        	return;
+     	    }
 
-            if (user != null) {
-                String emailValue = user.getEmail();
+    	    if (hasBackground) {
+    	    	PostType postType = background.equalsIgnoreCase("white") ? PostType.TEXT : PostType.TEXT_BACKGROUND;
+        	artworkService.savePost(emailValue, titleValue, background, postType);
+        	UI.getCurrent().navigate(MainFeed.class);
+        	return;
+    	    }
 
-                if (!background.isEmpty() && !background.equals("")) {
-                    if (!title.getValue().isEmpty()) {
-                     	artworkService.savePost(emailValue, title.getValue(), background);
-                     	UI.getCurrent().navigate(MainFeed.class);
-                    } else {
-                        Notification.show("Title cannot be empty", 1000, Notification.Position.MIDDLE)
-                        	.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    }
-                }else{
-		    if (originalFilename != null && !title.getValue().isEmpty()) {
-                    	try (InputStream inputStream = buffer.getInputStream()) {
-                             // Create a temporary file to store the uploaded image
-                             File tempFile = File.createTempFile("tempImage", ".png");
-                             tempFile.deleteOnExit(); // Ensure the file is deleted on exit
-
-                             // Save the uploaded image to the temporary file
-                             FileOutputStream fos = new FileOutputStream(tempFile);
-                             byte[] imageBytes = inputStream.readAllBytes();
-                             fos.write(imageBytes);
-
-                             String imageUrl = cloudinaryService.uploadImage(tempFile, ARTWORK_FOLDER);
-
-                             artworkService.saveArtwork(emailValue, imageUrl, title.getValue());
-
-                             Notification.show("Artwork saved successfully", 1000, Notification.Position.TOP_CENTER)
-                                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-			     UI.getCurrent().navigate(MainFeed.class);
-                    	}catch(Exception e){
-                    	     System.out.println(e.getMessage());
-                    	}
-                    } else if((originalFilename == null || originalFilename.isEmpty()) && !title.getValue().isEmpty()){
-                    	Notification.show("Image cannot be empty", 1000, Notification.Position.MIDDLE)
-                             .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    }
-                }
-
-                if(originalFilename == null && title.getValue().isEmpty()){
-                    Notification.show("Both fields cannot be empty", 1000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                }else if(title.getValue().isEmpty() && originalFilename != null){
-                    Notification.show("Title cannot be empty", 1000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                }
-            } else {
-                Notification.show("User not found", 3000, Notification.Position.TOP_CENTER)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-            }
-        });
-
+    	    postImage(emailValue, titleValue);
+	});
    	return tabs;
-   }
+    }
 
-   private HorizontalLayout createProfileHeader(){
+    // Method to post an image
+    private void postImage(String emailValue, String titleValue) {
+    	List<String> uploadImages = new ArrayList<>();
+
+    	buffer.getFiles().forEach(fileName -> {
+   	    try (InputStream inputStream = buffer.getInputStream(fileName)) {
+	    	// Save uploaded image to a temporary file
+            	File tempFile = File.createTempFile(fileName, ".png");
+            	tempFile.deleteOnExit();
+
+            	try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+		    fos.write(inputStream.readAllBytes());
+            	}
+
+            	String imageUrl = cloudinaryService.uploadImage(tempFile, ARTWORK_FOLDER);
+            	uploadImages.add(imageUrl);
+	    } catch (Exception e) {
+            	System.out.println(e.getMessage());
+	    }
+	});
+	mainPostButton.setText("Uploading...");
+	artworkService.saveArtwork(emailValue, uploadImages, titleValue, PostType.IMAGE);
+        UI.getCurrent().navigate(MainFeed.class);
+    }
+
+    private static class TabData {
+    	Tab tab;
+    	String cssClass;
+    	String background;
+    	boolean centerAlign;
+
+    	TabData(Tab tab, String cssClass, String background, boolean centerAlign) {
+            this.tab = tab;
+            this.cssClass = cssClass;
+            this.background = background;
+            this.centerAlign = centerAlign;
+    	}
+    }
+
+    private HorizontalLayout createProfileHeader(){
    	User user = userService.findCurrentUser();
 
    	String imageUrl = user.getProfileImage();
@@ -351,9 +417,9 @@ public class AddArtwork extends AppLayout {
 	layout.addClassName("add-artwork-layout");
 
 	return layout;
-   }
+    }
 
-   private void createHeader(){
+    private void createHeader(){
         Icon backButton = new Icon(VaadinIcon.ARROW_BACKWARD);
         backButton.addClassName("profile-back-button");
         backButton.addClickListener(event -> {

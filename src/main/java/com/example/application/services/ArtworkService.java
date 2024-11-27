@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.data.post.PostType;
 import com.example.application.data.Artwork;
 import com.example.application.data.User;
 import com.example.application.repository.UserRepository;
@@ -23,6 +24,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ArtworkService {
@@ -38,7 +40,7 @@ public class ArtworkService {
 	this.userRepository = userRepository;
     }
 
-    public void savePost(String email, String description, String background){
+    public void savePost(String email, String description, String background, PostType postType){
     	User user = userRepository.findByEmail(email);
 
         LocalDateTime timestamp = LocalDateTime.now(ZoneId.of("Asia/Manila"));
@@ -49,28 +51,30 @@ public class ArtworkService {
             artwork.setDescription(description);
             artwork.setPostTimestamp(timestamp);
             artwork.setBackground(background);
+            artwork.setPostType(postType);
 
             artworkRepository.save(artwork);
         }
     }
 
-    public void saveArtwork(String email, String artworkUrl, String description){
+    public void saveArtwork(String email, List<String> uploadedImages, String description, PostType postType){
         User user = userRepository.findByEmail(email);
 
-	DateTimeFormatter formatterr = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-					.withLocale(Locale.US);
+	/*DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+					.withLocale(Locale.US);*/
 
-	LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Manila"));
-	String dateTime = formatterr.format(localDateTime);
+	LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Manila"));
+	//String dateTime = formatter.format(currentTime);
 
         if (user != null) {
             Artwork artwork = new Artwork();
             artwork.setUser(user);
-            artwork.setArtworkUrl(artworkUrl);
+            artwork.setUploadedImages(uploadedImages);
+            //artwork.setArtworkUrl(artworkUrl);
             artwork.setDescription(description);
-            artwork.setDateTime(dateTime);
-            artwork.setPostTimestamp(localDateTime);
-
+            //artwork.setDateTime(dateTime);
+            artwork.setPostTimestamp(currentTime);
+            artwork.setPostType(postType);
             artworkRepository.save(artwork);
         }
     }

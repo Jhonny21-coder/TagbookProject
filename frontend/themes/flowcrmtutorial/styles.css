@@ -98,6 +98,7 @@ vaadin-avatar {
   --block-error-color: #DF484F;
   --block-text-color: #B0B4B7;
   --block-button-error-color: #FB3C44;
+  --text-area-color: #333436;
 }
 
 .main-layout-tabs vaadin-tab:before {

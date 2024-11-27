@@ -1,5 +1,6 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/repository/CommentRepository.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/profile/ViewAllFollowers.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/post/PostType.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/BlockOnTagbookView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/config/CustomUserDetailsService.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/dto/user/UserDTO.java
@@ -11,6 +12,7 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/services/UserServices.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/story/DisplayStoryView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/services/HeartReactionService.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/artworks/EditImage.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/artworks/MainArtworkView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/services/SavedPostService.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/services/ReplyReactionService.java
@@ -68,6 +70,7 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/form/AddContact.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/privacysafety/PrivacySafetyView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/config/PdfGenerator.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/utils/PostUtils.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/message_requests/UserRequestView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/StringListConverter.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/Status.java
@@ -96,6 +99,7 @@
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/SavedPost.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/ReadReceiptsView.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/password/RecoverView.java
+/data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/ViewPostImage.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/chat/ChatUtils.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/data/ChatMessage.java
 /data/data/com.termux/files/home/tagbook/src/main/java/com/example/application/views/form/UpdateUserInfo.java
