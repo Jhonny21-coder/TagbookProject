@@ -352,7 +352,7 @@ public class MainFeed extends AppLayout {
     	List<String> uploadedImages = artwork.getUploadedImages();
 
 	if (uploadedImages.size() <= 1) {
-	    Image image = new Image(artwork.getArtworkUrl(), "artwork-image");
+	    Image image = new Image(uploadedImages.get(0), "artwork-image");
             image.addClassName("main-feed-image");
             return image;
 	}
@@ -485,6 +485,7 @@ public class MainFeed extends AppLayout {
         formLayout.add(headerLayout, description, content, reactionsLayout, buttonsLayout);
     }
 
+    // Helper method for copying text
     private void copyText(ArtworkFeedDTO artwork) {
     	PostUtils postUtils = new PostUtils();
     	BottomSheet sheet = postUtils.createCopyTextSheet(artwork.getArtworkDescription());
@@ -492,6 +493,7 @@ public class MainFeed extends AppLayout {
     	sheet.open();
     }
 
+    // Method to get post's description
     private Span getDescription(ArtworkFeedDTO artwork) {
     	Span description = new Span();
     	description.addClassName("post-description");
@@ -551,19 +553,6 @@ public class MainFeed extends AppLayout {
 
     // Method to get reaction icon
     private SvgIcon getIcon(String reactType) {
-        /*Map<String, SvgIcon> reactionIcons = Map.of(
-            "like", new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))),
-            "love", new SvgIcon(new StreamResource("love.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/love.svg"))),
-            "care", new SvgIcon(new StreamResource("care.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/care.svg"))),
-            "haha", new SvgIcon(new StreamResource("haha.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/haha.svg"))),
-            "wow", new SvgIcon(new StreamResource("wow.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/wow.svg"))),
-            "sad", new SvgIcon(new StreamResource("sad.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/sad.svg"))),
-            "angry", new SvgIcon(new StreamResource("angry.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/angry.svg")))
-        );
-
-        SvgIcon icon = reactionIcons.getOrDefault(reactType, new SvgIcon(new StreamResource("like.svg",
-                () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))));
-        return icon;*/
         return new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/" + reactType  + ".svg")));
     }
 
