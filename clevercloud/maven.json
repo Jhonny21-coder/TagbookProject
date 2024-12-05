@@ -1,7 +1,7 @@
 {
   "build": {
     "type": "maven",
-    "goal": "clean package"
+    "goal": "clean"
   },
   "deploy": {
     "goal": "-Pproduction"
