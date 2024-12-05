@@ -1,5 +1,6 @@
 {
   "deploy": {
-    "build": "mvn clean package"
+    "goal": "mvn clean package -Pproduction",
+    "start": "java -jar target/flowcrmtutorial-2.0.0.jar "
   }
 }
