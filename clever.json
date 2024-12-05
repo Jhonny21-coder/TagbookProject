@@ -1,0 +1,6 @@
+{
+  "deploy": {
+    "build": "mvn clean package",
+    "start": "java -jar target/your-application.jar"
+  }
+}
