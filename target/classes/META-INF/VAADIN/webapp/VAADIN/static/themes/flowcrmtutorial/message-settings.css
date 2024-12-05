@@ -1,0 +1,691 @@
+@import "request-settings.css";
+@import "block.css";
+@import "message-delivery.css";
+@import "privacysafety/blocked-accounts.css";
+
+.message-mute-header {
+   padding-left: 0 !important;
+   color: white;
+   text-shadow: 0.5px 0.5px white;
+   align-self: center;
+   margin-bottom: 5px;
+   margin-top: 25px;
+}
+
+.message-mute-main-layout > vaadin-button {
+   background: var(--lumo-primary-color);
+   color: white;
+   text-shadow: 0.5px 0.5px white;
+   margin-left: 8px;
+   margin-right: 8px;
+   margin-bottom: 8px;
+}
+
+.message-mute-main-layout > span {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+   padding-left: 18px;
+   padding-top: 10p;
+   padding-bottom: 10px;
+}
+
+.message-mute-main-layout > span:first-child {
+   all: unset;
+   height: 4px;
+   background: var(--button-contrast-color);
+   width: 35px;
+   align-self: center;
+   border-radius: 5px;
+   margin-top: 12px;
+}
+
+.message-mute-main-layout > span:nth-child(8) {
+   padding-bottom: 5px !important;
+}
+
+.message-mute-main-layout > div > vaadin-radio-button {
+   display: flex;
+   color: var(--primary) !important;
+}
+
+.message-mute-main-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-mute-main-layout vaadin-radio-group[has-value] > vaadin-radio-button::part(radio)::after,
+.custom-mute-layout vaadin-radio-group[has-value] > vaadin-radio-button::part(radio)::after {
+  border: 6.5px solid white;
+}
+
+.message-mute-main-layout vaadin-radio-group[has-value] > vaadin-radio-button::part(radio) {
+  background: white !importan;
+}
+
+.message-mute-main-layout vaadin-radio-button::part(radio) {
+  border: 1.5px solid white !important;
+  background: none !important;
+  font-size: 15px;
+  padding-left: 0 !important;
+}
+
+/* ARCHIVE */
+/*.message-request-empty-div {
+   display: flex;
+   flex-direction: row;
+   align-items: center !important;
+   justify-content: center !important;
+   background: green;
+}*/
+
+.archive-div > div > span:nth-child(2) {
+   color: var(--secondary);
+}
+
+.archive-div > div {
+   display: flex;
+   flex-direction: column;
+   margin-left: 10px;
+}
+
+.archive-div > vaadin-avatar {
+   width: 45px;
+   height: 45px;
+   border: 0.5px solid var(--lumo-contrast-20pct);
+   margin-left: 15px;
+}
+
+.archive-div {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+.archive-main-layout {
+   height: 100%;
+}
+
+/* MESSAGE REQUESTS */
+/* User request */
+.message-request-options > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.message-request-options > span {
+  height: 4px;
+  background: var(--button-contrast-color);
+  width: 35px;
+  align-self: center;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.message-request-options > div {
+   padding-top: 7px;
+   padding-bottom: 8px;	
+   padding-left: 10px;
+}
+
+.message-request-options > div > vaadin-icon,
+.message-request-options > div > div > vaadin-icon {
+   background: var(--button-contrast-color);
+   border-radius: 50%;
+   font-size: 27px;
+   padding: 12px;
+   margin-right: 10px;
+}
+
+.message-request-options {
+   display: flex;
+   flex-direction: column;
+   margin-top: 10px;
+}
+
+.user-request-delete-dialog > div {
+   display: flex;
+   flex-direction: row;
+   align-self: end;
+}
+
+.user-request-delete-dialog > div > vaadin-button:nth-child(2) {
+   color: var(--lumo-primary-color);
+}
+
+.user-request-delete-dialog > div > vaadin-button {
+   color: white;
+   background: none;
+   margin: 0;
+   font-size: 15px;
+   margin-top: 10px;
+}
+
+.user-request-delete-dialog > span:nth-child(1) {
+  margin-bottom: 5px;
+  font-size: 18px;
+  text-shadow: 0.5px 0.5px white;
+}
+
+.user-request-delete-dialog::part(overlay) {
+   border-radius: 3px;
+   height: 180px;
+}
+
+.user-request-delete-dialog::part(content) {
+   display: flex;
+   flex-direction: column;
+   color: white;
+   justify-content: center;
+   background: #424242;
+}
+
+.user-request-footer-layout > vaadin-button {
+   color: white;
+   font-weight: bold;
+   width: 165px;
+   margin-top: 12px;
+   margin-bottom: 12px;
+}
+
+.user-request-app-layout {
+  border-bottom: 0.5px solid var(--lumo-contrast-10pct);
+}
+
+.user-request-footer-layout {
+   display: flex;
+   flex-direction: row;
+   justify-content: space-evenly;
+   align-items: center;
+   width: 100%;
+   border-top: 0.5px solid var(--nav-border);
+}
+
+.user-request-messages-div > div > vaadin-avatar {
+   width: 25px;
+   height: 25px;
+   margin-right: 5px;
+}
+
+.user-request-messages-div > div {
+    align-self: start;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+}
+
+.user-request-messages-div > div > span {
+   border-bottom-left-radius: 15px !important;
+   margin-bottom: 0 !important;
+}
+
+.user-request-messages-div > span:first-child {
+   border-top-left-radius: 15px;
+   border-top-right-radius: 15px;
+}
+
+.user-request-messages-div > span {
+    margin-left: 32px;
+}
+
+.user-request-messages-div > span,
+.user-request-messages-div > div > span {
+    align-self: start;
+    margin-bottom: 3px;
+    border-radius: 20p;
+    border-bottom-right-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    background: var(--lumo-contrast-5pct);
+    padding: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    display: flex;
+    justify-content: cente;
+    font-size: 15px;
+    max-width: 230px;
+    color: white;
+}
+
+.user-request-messages-div {
+   display: flex;
+   flex-direction: column;
+   margin-top: 10px;
+   margin-left: 10px;
+}
+
+.user-request-main-layout::-webkit-scrollbar {
+   display: none;
+}
+
+.user-request-main-layout {
+   display: flex;
+   flex-direction: column;
+   overflow-y: auto;
+   height: 100%;
+}
+
+.user-request-time {
+  font-size: 12px;
+  margin-top: 25px;
+  color: var(--secondary);
+  width: 100%;
+  text-align: center;
+}
+
+.user-request-view-profile > span {
+   font-size: 23px;
+   font-weight: bold;
+   color: white;
+   margin-bottom: 5px;
+   text-align: center;
+}
+
+.user-request-view-profile > vaadin-avatar {
+   width: 85px;
+   height: 85px;
+   margin-top: 15px;
+   margin-bottom: 5px;
+}
+
+.user-request-view-profile > vaadin-button {
+   font-weight: bold;
+   color: white;
+   background: var(--lumo-contrast-5pct);
+   border-radius: 8px;
+   height: 30px;
+}
+
+.user-request-view-profile {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+}
+
+.request-header-layout > div > span {
+   color: white;
+   font-weight: bold;
+}
+
+.request-header-layout > div > vaadin-avatar {
+   position: relativ;
+   right: 15px;
+   margin-right: 5px;
+}
+
+.request-header-layout > div {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   position: relative;
+   right: 65px;
+}
+
+.request-header-layout > vaadin-icon {
+   margin-right: 10px;
+}
+
+.request-header-layout {
+   width: 100%;
+   align-items: center;
+   justify-content: space-between;
+}
+
+.message-request-main-layout vaadin-tabs[orientation="horizontal"],
+.message-request-header-main vaadin-tabs::part(tabs) {
+   justify-content: center;
+   border-top: 1px solid var(--nav-borde);
+   width: 100%;
+}
+
+.message-request-main-layout > vaadin-tabsheet {
+   padding: 0;
+   margin: 0;
+   overflow-y: hidden;
+}
+
+.message-request-header-main vaadin-tab {
+   width: 163px;
+}
+
+.message-request-header-main vaadin-tab:before {
+   width: 160px;
+   height: 1px;
+   margin: 0;
+   padding: 0;
+}
+
+.message-request-main-layout > vaadin-tabsheet::part(tabs-container) {
+   align-self: center;
+   width: 340p;
+}
+
+.message-request-main-layout > vaadin-tabsheet::part(content) {
+   padding: 0;
+   overflow-y: auto;
+}
+
+.message-request-main-layout {
+   height: 100%;
+   overflow-y: auto;
+}
+
+.unread-count {
+    background: var(--lumo-error-color);
+    font-size: 10px;
+    border-radius: 50%;
+    padding: 3px;
+    width: 8px;
+    height: 8px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--button-contrast-color);
+    text-shadow: 0.5px 0.5px white;
+    margin-right: 5px;
+}
+
+.message-request-main-layout::-webkit-scrollbar {
+   display: none;
+}
+
+.message-request-child > div > span:nth-child(2) {
+   color: var(--secondary);
+}
+
+.message-request-child > vaadin-avatar {
+   width: 50px;
+   height: 50px;
+   margin-left: 10px;
+   margin-right: 10px;
+}
+
+.message-request-child > div > div {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+}
+
+.message-request-child > div > span {
+   color: white;
+}
+
+.message-request-child > div {
+   display: flex;
+   flex-direction: column;
+   font-size: 15px;
+}
+
+.message-request-child {
+   display: flex;
+   flex-direction: row;
+   padding-top: 10px;
+   padding-bottom: 10px;
+   width: 100%;
+}
+
+.message-request-empty-div > vaadin-icon {
+   color: var(--secondary);
+   margin-bottom: 10px;
+}
+
+.message-request-empty-div > span:nth-child(2) {
+   text-shadow: 0.5px 0.5px var(--block-text-color);
+}
+
+.message-settings-app-layout .message-request-empty-div {
+   height: 100% !important;
+   /*display: flex !important;
+   align-items: center !important;
+   justify-content: center !important;*/
+}
+
+.message-request-empty-div {
+   display: flex !important;
+   flex-direction: column !important;
+   align-items: center !important;
+   justify-content: center !important;
+   height: 100% !important;
+   color: var(--block-text-color);
+   text-align: center !important;
+}
+
+/* Spam Div */
+.settings-app-layout > div /*> div:nth-child(2)*/ {
+   height: 100% !important;
+}
+
+.message-request-main-div {
+   height: 100% !important;
+}
+
+/*.message-request-main-div > div:first-child > div {
+   height: 0.5px;
+   background: var(--nav-border);
+   margin-right: 10px;
+   margin-left: 10px;
+}*/
+
+.message-request-header-main > div {
+   font-size: 15px;
+}
+
+
+.message-request-header-main > div > p > span {
+    color: var(--primary-text-color);
+}
+
+.message-request-header-main > div > p {
+    color: var(--secondary);
+    margin-right: 10px;
+    margin-left: 20px;
+}
+
+.message-request-app-layout > div::-webkit-scrollbar {
+   display: none;
+}
+
+.message-request-app-layout > div {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.message-request-header-main > vaadin-horizontal-layout {
+   border-bottom: 0.5px solid var(--nav-border);
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+/* ACTIVE STATUS */
+.active-status-dialog > div > span:nth-child(2) {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.active-status-dialog > div > span:nth-child(1) {
+    color: white;
+    font-weight: bold;
+}
+
+.active-status-dialog > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.active-status-dialog > div > div > vaadin-button:nth-child(1) {
+    background: ;
+}
+
+.active-status-dialog > div > div > vaadin-button:nth-child(2) {
+    background: var(--lumo-primary-color);
+}
+
+.active-status-dialog > div > div > vaadin-button {
+    width: 130px;
+    color: white;
+    font-weight: bold;
+    border-radius: 7px;
+}
+
+.active-status-dialog > div > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.active-status-dialog::part(overlay) {
+    border-radius: 7px;
+    align-items: center;
+    width: 300px;
+}
+
+.active-status-dialog::part(content) {
+    background: var(--button-contrast-color);
+    align-items: center;
+    padding: 10px 15px 10px 15px;
+}
+
+.settings-status-main-layout > div:nth-child(2) > span > span {
+    color: white;
+    padding-top: 5px;
+}
+
+.settings-status-main-layout p {
+    margin-top: 25px !importan;
+}
+
+.settings-status-main-layout > div:nth-child(2) > span {
+    margin-bottom: 15px;
+}
+
+.settings-status-main-layout > div:nth-child(2) > span,
+.settings-status-main-layout p {
+    font-size: 12px;
+    color: var(--secondary);
+    margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.settings-status-main-layout > div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-status-main-layout > div:first-child > div:nth-child(1) {
+   display: flex;
+   justify-content: space-between;
+}
+
+.settings-status-main-layout > div:first-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-status-main-layout > div:first-child > div:nth-child(2) {
+   background: var(--nav-border);
+   height: 0.5px;
+   margin-top: 10px;
+   display: flex;
+}
+
+.settings-status-main-layout > div:first-child {
+    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+
+/* MAIN LAYOUT */
+.message-settings-main-layout > div > span {
+    margin-right: 5px;
+    color: var(--lumo-contrast-60pct);
+}
+
+.message-settings-main-layout > div:active,
+.settings-status-main-layout > div:first-child:active,
+.settings-status-main-layout > div:nth-child(2) > span > span:active,
+.header-back-button:active,
+.message-request-child:active,
+.archive-div:active,
+.message-request-options > div:active,
+.message-mute-main-layout > span:active {
+    background: var(--hover-color);
+}
+
+.message-settings-main-layout > div > div > vaadin-icon {
+    background: var(--button-contrast-color);
+    font-size: 23px;
+    border-radius: 50%;
+    padding: 8px;
+    margin-right: 10px;
+    fill: white;
+}
+
+.message-settings-main-layout > div:first-child {
+    margin-top: 5px;
+}
+
+.message-settings-main-layout > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+}
+
+.message-settings-main-layout {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.settings-numbers {
+    color: white !important;
+    font-size: 11px;
+    background: var(--lumo-error-color);
+    border-radius: 30px;
+    height: 5px;
+    padding: 7px;
+    display: flex;
+    align-items: center;
+    text-shadow: 0.5px 0.5px white;
+}
+
+/* HEADER */
+.message-settings-header-layout > span {
+    position: relative;
+    right: 10px;
+}
+
+.message-settings-header-layout {
+    align-items: center;
+    color: white;
+    text-shadow: 0.5px 0.5px white;
+}
+
+.settings-app-layout::part(navbar) {
+    border-bottom: 0.5px solid var(--nav-border);
+}
+
+.message-settings-app-layout::part(navbar),
+.message-request-app-layout::part(navbar) {
+    border-bottom: 0.5px solid var(--nav-border);
+}
+
+.message-settings-app-layout[overlay],
+.message-settings-app-layout::part(navbar),
+.settings-app-layout[overlay],
+.settings-app-layout::part(navbar),
+.user-request-app-layout[overlay],
+.user-request-app-layout::part(navbar),
+.message-request-app-layout::part(navbar),
+.message-request-app-layout[overlay] {
+    background: var(--primary);
+}

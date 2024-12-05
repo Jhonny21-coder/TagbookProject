@@ -1,0 +1,50 @@
+.friends-of-friends-main-layout vaadin-radio-group > label {
+   color: white;
+   text-shadow: 0.5px 0.5px white;
+   font-size: 13px;
+}
+
+.friends-of-friends-main-layout vaadin-radio-button:active {
+   background: var(--hover-color);
+}
+
+.friends-of-friends-main-layout vaadin-radio-button {
+   width: 100%;
+   padding-top: 7px;
+   padding-bottom: 7px;
+}
+
+.friends-of-friends-main-layout vaadin-radio-group {
+   margin-top: 10px;
+   width: 100%;
+}
+
+.friends-of-friends-main-layout vaadin-radio-button > label {
+   margin-bottom: 15p;
+}
+
+.friends-of-friends-main-layout {
+   padding-left: 18px;
+   padding-right: 18px;
+}
+
+.friends-of-friends-main-layout > div > vaadin-radio-button {
+   color: var(--primary) !important;
+}
+
+.friends-of-friends-main-layout vaadin-radio-group[has-value] > vaadin-radio-button::part(radio)::after {
+  border: 4.5px solid white;
+}
+
+.friends-of-friends-main-layout vaadin-radio-group[has-value] > vaadin-radio-button {
+}
+
+.friends-of-friends-main-layout vaadin-radio-button::part(radio) {
+  border: 1.5px solid white !important;
+  background: none !important;
+  font-size: 15px;
+  padding-left: 0 !important;
+  margin-left: 20px;
+  width: 13px;
+  height: 13px;
+}

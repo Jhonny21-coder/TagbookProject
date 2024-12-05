@@ -1,0 +1,17 @@
+import '@vaadin/polymer-legacy-adapter/style-modules.js';
+import '@vaadin/combo-box/src/vaadin-combo-box.js';
+import 'Frontend/generated/jar-resources/flow-component-renderer.js';
+import 'Frontend/generated/jar-resources/comboBoxConnector.js';
+import '@vaadin/app-layout/src/vaadin-app-layout.js';
+import '@vaadin/tooltip/src/vaadin-tooltip.js';
+import '@vaadin/button/src/vaadin-button.js';
+import 'Frontend/generated/jar-resources/buttonFunctions.js';
+import '@vaadin/form-layout/src/vaadin-form-layout.js';
+import '@vaadin/icon/src/vaadin-icon.js';
+import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
+import '@vaadin/confirm-dialog/src/vaadin-confirm-dialog.js';
+import '@vaadin/form-layout/src/vaadin-form-item.js';
+import '@vaadin/multi-select-combo-box/src/vaadin-multi-select-combo-box.js';
+import '@vaadin/text-field/src/vaadin-text-field.js';
+import '@vaadin/icons/vaadin-iconset.js';
+import '@vaadin/notification/src/vaadin-notification.js';

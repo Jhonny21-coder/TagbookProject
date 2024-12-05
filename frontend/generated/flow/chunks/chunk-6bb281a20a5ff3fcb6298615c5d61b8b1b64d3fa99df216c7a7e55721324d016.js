@@ -1,0 +1,13 @@
+import '@vaadin/polymer-legacy-adapter/style-modules.js';
+import '@vaadin/app-layout/src/vaadin-app-layout.js';
+import '@vaadin/tooltip/src/vaadin-tooltip.js';
+import '@vaadin/button/src/vaadin-button.js';
+import 'Frontend/generated/jar-resources/buttonFunctions.js';
+import '@vaadin/vertical-layout/src/vaadin-vertical-layout.js';
+import '@vaadin/login/src/vaadin-login-form.js';
+import '@vaadin/icon/src/vaadin-icon.js';
+import '@vaadin/horizontal-layout/src/vaadin-horizontal-layout.js';
+import '@vaadin/email-field/src/vaadin-email-field.js';
+import '@vaadin/icons/vaadin-iconset.js';
+import '@vaadin/notification/src/vaadin-notification.js';
+import 'Frontend/generated/jar-resources/flow-component-renderer.js';

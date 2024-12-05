@@ -1,0 +1,100 @@
+.search-people-name {
+  color: white;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 14px;
+  position: relative;
+  bottom: 15px;
+}
+
+.search-people-see-all-button {
+  width: 330px;
+  height: 33px;
+  color: white;
+  background: var(--button-contrast-color);
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.search-people-buttons-layout {
+  position: relative;
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.search-people-buttons-layout > vaadin-button:nth-child(2){
+  background: var(--lumo-contrast-10pct);
+  width: 90px;
+}
+
+vaadin-button.search-unfollow-button {
+  background: var(--button-contrast-color);
+}
+
+vaadin-button.search-follow-button {
+  background: var(--lumo-primary-color);
+}
+
+.search-people-buttons-layout > vaadin-button:nth-child(1){
+  /*background: var(--lumo-primary-color);*/
+  width: 105px;
+}
+
+.search-people-buttons-layout > vaadin-button:nth-child(1),
+.search-people-buttons-layout > vaadin-button:nth-child(2){
+  color: white;
+  height: 35px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.search-people-header-text {
+  color: white;
+  font-weight: bold;
+  position: relative;
+  top: 10px;
+  left: -80px;
+}
+
+.search-layout {
+  margin-left: 15px;
+}
+
+.search-history-layout {
+  padding: 0;
+}
+.search-people-main-layout {
+  padding: 0;
+  align-items: center;
+}
+
+.search-people-child-layout:nth-child(1) {
+  margin-left: 15px;
+}
+
+.search-people-child-layout {
+  padding: 0;
+  margin: 0;
+  height: 365px;
+  width: 200px;
+  border: 0.5px solid var(--lumo-contrast-20pct);
+  border-radius: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-people-parent-layout {
+  overflow: auto;
+  width: 100%;
+  padding: 0;
+}
+
+.search-people-image {
+   width: 230px;
+   height: 230px;
+   border-radius: 10px 10px 0 0;
+   object-fit: cover;
+   pointer-events: none;
+}
