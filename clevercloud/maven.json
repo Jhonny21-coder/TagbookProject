@@ -1,8 +1,9 @@
-{
-  "build": {
-    "type": "maven",
-    "goal": "clean"
-  },
+#{
+#  "build": {
+#    "type": "maven",
+#    "goal": "clean"
+#  },
+}
   "deploy": {
     "goal": "-Pproduction"
   }
