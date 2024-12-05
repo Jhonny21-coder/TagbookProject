@@ -111,7 +111,7 @@
 }
 
 .add-post-image-div > div:last-child div {
-   display: flex;
+   display: fle;
    flex-direction: colum;
    justify-content: cente;
    width: 100%;
@@ -125,10 +125,15 @@
     pointer-events: none;
 }
 
+.add-post-image-div > div > img {
+   height: 165p;
+}
+
 .add-post-image-div > div {
    border-radius: 8px;
    width: 170px;
    height: 165px;
+   background: green;
 }
 
 .add-post-image-div vaadin-vertical-layout {

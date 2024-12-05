@@ -21,7 +21,6 @@
    justify-content: center !important;
    align-items: center;
    height: auto;
-   background: green;
    width: 100%;
 }
 
@@ -33,7 +32,6 @@
 .image-row-three:last-child > div {
    object-fit: cover;
    width: 100%;
-   background: green;
 }
 
 .image-row-three:first-child > div {

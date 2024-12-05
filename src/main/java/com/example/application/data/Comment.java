@@ -25,10 +25,6 @@ public class Comment {
      private String userImage;
      private LocalDateTime dateTimePosted;
 
-     //private long likeReact;
-     //private long heartReact;
-     //private long happyReact;
-
      public Long getId() {
         return id;
      }
@@ -84,28 +80,4 @@ public class Comment {
      public void setDateTimePosted(){
      	this.dateTimePosted = LocalDateTime.now(ZoneId.of("Asia/Manila"));
      }
-
-     /*public long getLikeReact(){
-     	return likeReact;
-     }
-
-     public void setLikeReact(long likeReact){
-     	this.likeReact = likeReact;
-     }
-
-     public long getHeartReact(){
-        return heartReact;
-     }
-
-     public void setHeartReact(long heartReact){
-        this.heartReact = heartReact;
-     }
-
-     public long getHappyReact(){
-        return happyReact;
-     }
-
-     public void setHappyReact(long happyReact){
-        this.happyReact = happyReact;
-     }*/
 }

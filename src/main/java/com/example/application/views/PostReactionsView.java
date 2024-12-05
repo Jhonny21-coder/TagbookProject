@@ -15,6 +15,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 
@@ -172,12 +173,12 @@ public class PostReactionsView {
     // Method to update reactions count
     private void updateTotalReactions(Long totalReactions) {
         AtomicLong totalReacts = new AtomicLong(totalReactions);
-        if (totalReacts.get() > 1) {
+        if (totalReacts.get() > 0) {
             reacts.setText(formatValue(totalReacts.get(), true));
             likeButton.setText(formatValue(totalReacts.get(), false));
         } else {
             likeButton.setText("");
-            reacts.setVisible(false);
+            reacts.setText("");
         }
     }
 
@@ -236,11 +237,11 @@ public class PostReactionsView {
     	Artwork _artwork = artworkService.getArtworkById(artwork.getArtworkId());
         postReactionService.savePostReaction(_artwork, user, reactType);
         updateReactionCount(totalReacts.incrementAndGet());
-        setReactionIcon(likeButton, colorTheme);
+        setReactionIcon(reactType);
         notificationService.createReactNotification(user, _artwork);
 
         if (!isHold) {
-            setReactionIcon(likeButton, "primary");
+            setReactionIcon("primary");
         }
     }
 
@@ -262,13 +263,12 @@ public class PostReactionsView {
         postReactionService.removePostReaction(reactorId, artworkId);
         updateReactionCount(totalReacts.decrementAndGet());
 
-        SvgIcon likeIcon = new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg")));
-        likeButton.setIcon(likeIcon);
+        likeButton.setIcon(new Icon("vaadin", "thumbs-up-o"));
     }
 
     private void updateReaction(PostReaction reactor, String reactType, String colorTheme) {
         postReactionService.updatePostReaction(reactor, reactType);
-        setReactionIcon(likeButton, colorTheme);
+        setReactionIcon(reactType);
     }
 
     private void updateReactionCount(long count) {
@@ -277,7 +277,7 @@ public class PostReactionsView {
         reacts.setText(formattedValue);
     }
 
-    private void setReactionIcon(Button button, String reactType) {
+    private void setReactionIcon(String reactType) {
         Map<String, SvgIcon> reactionIcons = Map.of(
             "like", new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))),
             "love", new SvgIcon(new StreamResource("love.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/love.svg"))),
@@ -288,8 +288,8 @@ public class PostReactionsView {
             "angry", new SvgIcon(new StreamResource("angry.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/angry.svg")))
         );
 
-        SvgIcon icon = reactionIcons.getOrDefault(reactType, new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))));
-        button.setIcon(icon);
+        SvgIcon icon = reactionIcons.get(reactType);
+        likeButton.setIcon(icon != null ? icon : new Icon("vaadin", "thumbs-up-o"));
     }
 
     private String formatValue(long value, boolean includeDecimal) {

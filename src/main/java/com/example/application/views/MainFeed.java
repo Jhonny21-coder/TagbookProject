@@ -357,13 +357,7 @@ public class MainFeed extends AppLayout {
             return image;
 	}
 
-	Map<Integer, String> sizeMap = Map.of(
-	    	1, "one",
-	    	2, "two",
-	    	3, "three",
-	    	4, "four",
-	    	5, "five"
-	);
+	Map<Integer, String> sizeMap = Map.of(1, "one", 2, "two", 3, "three", 4, "four", 5, "five");
 
 	int uploadedImagesSize = uploadedImages.size();
 	String size = sizeMap.getOrDefault(uploadedImagesSize, "more");
@@ -557,7 +551,7 @@ public class MainFeed extends AppLayout {
 
     // Method to get reaction icon
     private SvgIcon getIcon(String reactType) {
-        Map<String, SvgIcon> reactionIcons = Map.of(
+        /*Map<String, SvgIcon> reactionIcons = Map.of(
             "like", new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))),
             "love", new SvgIcon(new StreamResource("love.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/love.svg"))),
             "care", new SvgIcon(new StreamResource("care.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/care.svg"))),
@@ -569,7 +563,8 @@ public class MainFeed extends AppLayout {
 
         SvgIcon icon = reactionIcons.getOrDefault(reactType, new SvgIcon(new StreamResource("like.svg",
                 () -> getClass().getResourceAsStream("/META-INF/resources/icons/like.svg"))));
-        return icon;
+        return icon;*/
+        return new SvgIcon(new StreamResource("like.svg", () -> getClass().getResourceAsStream("/META-INF/resources/icons/" + reactType  + ".svg")));
     }
 
     // Method to set a background for post

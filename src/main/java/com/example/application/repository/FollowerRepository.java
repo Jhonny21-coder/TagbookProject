@@ -44,4 +44,7 @@ public interface FollowerRepository extends JpaRepository<Follower, Long> {
     List<Follower> findUserUnconfirmedFollowers(@Param("followedUserId") Long followedUserId);
 
     boolean existsByFollowerAndFollowedUser(User follower, User followedUser);
+
+    @Query("SELECT f FROM Follower f WHERE f.followedUser = :user")
+    List<Follower> findFollowersByUser(@Param("user") User user);
 }
