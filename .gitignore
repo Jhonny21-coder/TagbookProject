@@ -64,6 +64,3 @@ node_modules/
 
 # dotenv environment variables file
 .env
-
-# Project's jar file
-target/flowcrmtutorial-2.0.0.jar
