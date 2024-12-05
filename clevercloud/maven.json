@@ -1,6 +1,9 @@
 {
+  "build": {
+    "type": "maven",
+    "goal": "clean package"
+  },
   "deploy": {
-    "goal": "mvn clean package -Pproduction",
-    "start": "java -jar target/flowcrmtutorial-2.0.0.jar "
+    "goal": "java -jar flowcrmtutorial-2.0.0.jar"
   }
 }
