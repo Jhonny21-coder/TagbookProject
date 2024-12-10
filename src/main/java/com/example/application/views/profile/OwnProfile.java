@@ -512,26 +512,12 @@ public class OwnProfile extends AppLayout {
     public void loadPosts(User user) {
         System.out.println("Listener triggered. Current Page: " + currentPage);
 
-        ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
-
-        List<ArtworkFeedDTO> artworks = artworkService.getUserArtworkDTOs(user, currentPage * PAGE_SIZE, PAGE_SIZE);
-        for (ArtworkFeedDTO artwork : artworks) {
-             String background = artwork.getArtworkBackground();
-
-             if (background == null) {
-                 feed.createArtworkPost(artwork, formLayout);
-             } else {
-                 feed.createPostOnly(artwork, formLayout);
-             }
-        }
+        ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService, formLayout);
+        feed.loadPosts(user, currentPage);
         currentPage++;
-        System.out.println("Artworks size: " + artworks.size());
     }
 
     private void createFollowerLayout(User user) {
-    	//ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
-
-    	//FormLayout formLayout = new FormLayout();
     	CustomEvent.handleScrollEvent(formLayout);
         formLayout.getElement().addEventListener("scroll-to-bottom", e -> {
             // Load more data

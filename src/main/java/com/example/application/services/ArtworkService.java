@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
+import java.util.Collections;
 
 @Service
 public class ArtworkService {
@@ -48,6 +49,7 @@ public class ArtworkService {
         if (user != null) {
             Artwork artwork = new Artwork();
             artwork.setUser(user);
+            artwork.setUploadedImages(List.of("NO IMAGE"));
             artwork.setDescription(description);
             artwork.setPostTimestamp(timestamp);
             artwork.setBackground(background);
@@ -60,20 +62,14 @@ public class ArtworkService {
     public void saveArtwork(String email, List<String> uploadedImages, String description, PostType postType){
         User user = userRepository.findByEmail(email);
 
-	/*DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-					.withLocale(Locale.US);*/
-
-	LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Manila"));
-	//String dateTime = formatter.format(currentTime);
+	LocalDateTime timestamp = LocalDateTime.now(ZoneId.of("Asia/Manila"));
 
         if (user != null) {
             Artwork artwork = new Artwork();
             artwork.setUser(user);
             artwork.setUploadedImages(uploadedImages);
-            //artwork.setArtworkUrl(artworkUrl);
             artwork.setDescription(description);
-            //artwork.setDateTime(dateTime);
-            artwork.setPostTimestamp(currentTime);
+            artwork.setPostTimestamp(timestamp);
             artwork.setPostType(postType);
             artworkRepository.save(artwork);
         }

@@ -253,20 +253,6 @@ public class AddArtwork extends AppLayout {
     	return bottomSheet;
     }
 
-    /*private Div createOtherActions() {
-    	Div actionsDiv = new Div(
-            createActionDiv("photos", "Photos/videos"),
-            createActionDiv("tag-people", "Tag people"),
-            createActionDiv("location", "Add location"),
-            createActionDiv("feeling", "Feeling/activity"),
-            createActionDiv("event", "Create event"),
-            createActionDiv("live", "Go live"),
-            mainPostButton
-    	);
-    	actionsDiv.addClassName("add-post-actions-div");
-    	return actionsDiv;
-    }*/
-
     private Div createActionDiv(String iconName, String text) {
     	Div actionDiv = new Div(getIcon(iconName), new Span(text));
     	return actionDiv;

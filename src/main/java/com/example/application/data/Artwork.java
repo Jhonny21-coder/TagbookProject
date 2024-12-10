@@ -37,6 +37,6 @@ public class Artwork {
     private PostType postType;
 
     @Convert(converter = StringListConverter.class)
-    @Column(name = "uploaded_images", nullable = false)
+    @Column(name = "uploaded_images", nullable = true)
     private List<String> uploadedImages;
 }

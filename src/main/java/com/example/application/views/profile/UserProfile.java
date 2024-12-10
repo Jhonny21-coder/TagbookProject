@@ -184,16 +184,6 @@ public class UserProfile extends AppLayout implements HasUrlParameter<Long> {
            followText.setText("followers");
         }
 
-        /*Div artworksLayout = new Div(totalArtworks, artworkText);
-        artworksLayout.addClassName("profile-artworks-layout");
-
-        Div followLayout = new Div(totalFollowers, followText);
-        followLayout.addClassName("profile-follow-layout");
-
-	Button followButton = createButtonListener(user, layout);
-
-        return new HorizontalLayout(artworksLayout, followButton, followLayout);*/
-
         Div artworksLayout = new Div(totalArtworks, artworkText);
         artworksLayout.addClassName("own-profile-artworks-layout");
 
@@ -205,7 +195,6 @@ public class UserProfile extends AppLayout implements HasUrlParameter<Long> {
         Button messageButton = new Button("Message", new Icon("vaadin", "chat"));
         messageButton.addClassName("profile-message-button");
         messageButton.addClickListener(event -> {
-             //VaadinSession.getCurrent().getSession().setAttribute("own-profile", user.getId());
              UI.getCurrent().navigate(ChatView.class, user.getId());
         });
 
@@ -495,11 +484,10 @@ public class UserProfile extends AppLayout implements HasUrlParameter<Long> {
         VerticalLayout followLayout = new VerticalLayout(followerHeader, layout, imageButton);
 	followLayout.addClassName("second-follow-layout");
 
-	ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService);
+	ProfileFeed feed = new ProfileFeed(artworkService, likeService, heartService, commentService, userService, postService, notificationService, formLayout);
+	feed.loadPosts(user, currentPage);
 
-	FormLayout profileImageFeed = feed.createFeed(user, currentPage);
-
-        formLayout.add(image, layout2, buttonLayout, informationLayout, followLayout, profileImageFeed);
+        formLayout.add(image, layout2, buttonLayout, informationLayout, followLayout);
 
     	setContent(formLayout);
     }

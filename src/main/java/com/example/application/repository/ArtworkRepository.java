@@ -46,7 +46,8 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
                 u.profileImage,
                 a.artworkUrl,
                 (SELECT COUNT(c) FROM Comment c WHERE c.artwork.id = a.id),
-                a.postType
+                a.postType,
+                a.uploadedImages
             )
         FROM Artwork a
         JOIN a.user u
@@ -59,8 +60,14 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
 
     List<Artwork> findByUserId(Long userId);
 
-    @Query("SELECT c FROM Artwork c " +
+    /*@Query("SELECT c FROM Artwork c " +
        "WHERE c.user.id = :userId AND (LOWER(c.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
-    List<Artwork> search(@Param("searchTerm") String searchTerm,
-    			 @Param("userId") Long userId);
+    List<Artwork> search(@Param("searchTerm") String searchTerm, @Param("userId") Long userId);*/
+
+    @Query("""
+    	SELECT c FROM Artwork c
+    	WHERE c.user.id = :userId
+    	AND (LOWER(c.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
+    """)
+    List<Artwork> search(@Param("searchTerm") String searchTerm, @Param("userId") Long userId);
 }
